@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Recherche</title>
+  <title>MyBiblio — Paramètres</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,24 +11,26 @@
     <div class="container">
       <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
       <nav class="main-nav" aria-label="Navigation principale">
-        <a href="index.html" class="nav-link active">Recherche</a>
+        <a href="index.html" class="nav-link">Recherche</a>
         <a href="add.html" class="nav-link">Ajouter un livre</a>
         <a href="shelves.html" class="nav-link">Par étagère</a>
-        <a href="settings.html" class="nav-link">Paramètres</a>
+        <a href="settings.html" class="nav-link active">Paramètres</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>Recherche</h2>
-      <label for="q">Rechercher par titre ou auteur</label>
-      <input id="q" placeholder="Titre, auteur ou ISBN...">
-      <div id="searchResults" class="list" aria-live="polite"></div>
+      <h2>Paramètres</h2>
+      <p>Gérer les options liées à votre bibliothèque locale.</p>
+      <div class="controls">
+        <button id="clearBtn" class="secondary">Vider le stockage local</button>
+      </div>
+      <p class="muted">Attention: cette action supprimera tous vos livres et étagères stockés localement. Cette action est irréversible.</p>
     </section>
   </main>
 
   <footer class="site-footer"><div class="container">Stockage: localStorage — les données sont locales à ce navigateur/appareil.</div></footer>
-  <script type="module" src="search.js"></script>
+  <script type="module" src="settings.js"></script>
 </body>
 </html>
