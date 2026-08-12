@@ -1,0 +1,21 @@
+/* styles.css — simple styles for the demo */
+:root{--bg:#f7f7fb;--card:#fff;--accent:#2b6cb0;--muted:#666}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;line-height:1.4;margin:0;background:var(--bg);color:#111;padding:24px}
+header{margin-bottom:18px}
+h1{margin:.2rem 0}
+.card{background:var(--card);padding:16px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+label{display:block;margin-top:8px;font-weight:600}
+input,select,button{font:inherit;padding:8px;border:1px solid #ddd;border-radius:6px}
+select{appearance:none}
+.inline-controls{margin-top:8px}
+.form-actions{margin-top:12px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.list .book{padding:10px;border-bottom:1px solid #eee}
+.book h3{margin:0;font-size:1rem}
+.book p{margin:.25rem 0;color:var(--muted)}
+.hidden{display:none}
+.import-label input{display:none}
+button{background:var(--accent);color:#fff;border:none}
+button.secondary{background:#eee;color:#111}
+footer{margin-top:18px;color:var(--muted)}
