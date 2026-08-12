@@ -11,10 +11,9 @@
     <div class="container">
       <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
       <nav class="main-nav" aria-label="Navigation principale">
-        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="index.html" class="nav-link">Recherche</a>
         <a href="add.html" class="nav-link active">Ajouter un livre</a>
         <a href="shelves.html" class="nav-link">Par étagère</a>
-        <a href="search.html" class="nav-link">Recherche</a>
       </nav>
     </div>
   </header>
@@ -23,6 +22,12 @@
     <section aria-labelledby="add-book-title" class="card">
       <h2 id="add-book-title">Ajouter un livre</h2>
       <form id="addBookForm">
+        <label for="isbn">ISBN (optionnel)</label>
+        <div class="isbn-row">
+          <input id="isbn" name="isbn" placeholder="Ex: 9780140449136">
+          <button type="button" id="fetchIsbn" class="secondary">Chercher par ISBN</button>
+        </div>
+
         <label for="title">Titre</label>
         <input id="title" name="title" required>
 

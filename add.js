@@ -1,7 +1,9 @@
-// add.js — page-specific logic for add.html
+// add.js — page-specific logic for add.html (with ISBN lookup)
 import { LocalStorageAdapter as Storage } from './storage-local.js';
 
 const dom = {
+  isbn: document.getElementById('isbn'),
+  fetchIsbnBtn: document.getElementById('fetchIsbn'),
   shelfSelect: document.getElementById('shelfSelect'),
   createShelfBtn: document.getElementById('createShelfBtn'),
   newShelfContainer: document.getElementById('newShelfContainer'),
@@ -31,6 +33,22 @@ function populateShelves(shelves){
   }
 }
 
+// ISBN lookup using OpenLibrary
+async function lookupISBN(isbn){
+  const cleaned = (isbn||'').replace(/[^0-9Xx]/g,'');
+  if(!cleaned) throw new Error('ISBN invalide');
+  const url = `https://openlibrary.org/api/books?bibkeys=ISBN:${cleaned}&format=json&jscmd=data`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Erreur réseau lors de la recherche ISBN');
+  const data = await res.json();
+  const key = `ISBN:${cleaned}`;
+  if(!data[key]) throw new Error('Aucun résultat trouvé pour cet ISBN');
+  const book = data[key];
+  const title = book.title || '';
+  const authors = Array.isArray(book.authors) ? book.authors.map(a=>a.name).join(', ') : '';
+  return { title, authors };
+}
+
 // show/hide new shelf form
 dom.createShelfBtn.addEventListener('click', ()=>{
   dom.newShelfContainer.classList.remove('hidden');
@@ -58,6 +76,25 @@ dom.addNewShelf.addEventListener('click', async ()=>{
     dom.newShelfName.value = '';
   }catch(err){
     alert(err.message || 'Erreur');
+  }
+});
+
+// ISBN button
+dom.fetchIsbnBtn.addEventListener('click', async ()=>{
+  const val = (dom.isbn.value||'').trim();
+  if(!val) return alert('Veuillez saisir un ISBN');
+  dom.fetchIsbnBtn.disabled = true;
+  dom.fetchIsbnBtn.textContent = 'Recherche...';
+  try{
+    const info = await lookupISBN(val);
+    if(info.title) document.getElementById('title').value = info.title;
+    if(info.authors) document.getElementById('author').value = info.authors;
+    alert('Données récupérées. Vérifiez et complétez si nécessaire.');
+  }catch(err){
+    alert(err.message || 'Recherche ISBN échouée');
+  }finally{
+    dom.fetchIsbnBtn.disabled = false;
+    dom.fetchIsbnBtn.textContent = 'Chercher par ISBN';
   }
 });
 

@@ -3,41 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Accueil</title>
+  <title>MyBiblio — Recherche</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <h1 class="brand">MyBiblio</h1>
+      <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
       <nav class="main-nav" aria-label="Navigation principale">
-        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="index.html" class="nav-link active">Recherche</a>
         <a href="add.html" class="nav-link">Ajouter un livre</a>
         <a href="shelves.html" class="nav-link">Par étagère</a>
-        <a href="search.html" class="nav-link">Recherche</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>Bienvenue</h2>
-      <p>MyBiblio est une petite application front‑end qui vous permet de gérer vos livres et vos étagères en utilisant le stockage local (localStorage). Utilisez le menu pour ajouter un livre, afficher la liste par étagère, ou rechercher dans votre bibliothèque.</p>
-      <ul class="home-actions">
-        <li><a class="btn" href="add.html">Ajouter un livre</a></li>
-        <li><a class="btn" href="shelves.html">Voir les livres par étagère</a></li>
-        <li><a class="btn" href="search.html">Rechercher</a></li>
-      </ul>
-    </section>
-
-    <section class="card small-card">
-      <h3>Note</h3>
-      <p>Les données sont stockées localement dans votre navigateur. Pensez à utiliser <strong>Exporter</strong> si vous souhaitez conserver ou transférer votre bibliothèque.</p>
+      <h2>Recherche</h2>
+      <label for="q">Rechercher par titre ou auteur</label>
+      <input id="q" placeholder="Titre, auteur ou ISBN...">
+      <div id="searchResults" class="list" aria-live="polite"></div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">Stockage: localStorage — les données restent sur cet appareil. &middot; <a href="index.html">Home</a></div>
-  </footer>
+  <footer class="site-footer"><div class="container">Stockage: localStorage — les données sont locales à ce navigateur/appareil.</div></footer>
+  <script type="module" src="search.js"></script>
 </body>
 </html>
