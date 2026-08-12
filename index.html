@@ -3,67 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Ma bibliothèque</title>
+  <title>MyBiblio — Accueil</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>MyBiblio</h1>
-    <p>Gérez vos livres et vos étagères (stockage local)</p>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="brand">MyBiblio</h1>
+      <nav class="main-nav" aria-label="Navigation principale">
+        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="add.html" class="nav-link">Ajouter un livre</a>
+        <a href="shelves.html" class="nav-link">Par étagère</a>
+        <a href="search.html" class="nav-link">Recherche</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <section aria-labelledby="add-book-title" class="card">
-      <h2 id="add-book-title">Ajouter un livre</h2>
-      <form id="addBookForm">
-        <label for="title">Titre</label>
-        <input id="title" name="title" required>
-
-        <label for="author">Auteur</label>
-        <input id="author" name="author">
-
-        <label for="shelfSelect">Étagère</label>
-        <!-- L'étagère est maintenant obligatoire -->
-        <select id="shelfSelect" name="shelfId" required aria-required="true">
-          <option value="" selected disabled>Choisir une étagère</option>
-        </select>
-
-        <div class="inline-controls">
-          <button type="button" id="createShelfBtn">Créer une nouvelle étagère</button>
-        </div>
-
-        <div id="newShelfContainer" class="hidden">
-          <label for="newShelfName">Nom de la nouvelle étagère</label>
-          <input id="newShelfName" placeholder="Ex: Football" aria-label="Nom de la nouvelle étagère">
-          <div class="inline-controls">
-            <button type="button" id="addNewShelf">Ajouter étagère</button>
-            <button type="button" id="cancelNewShelf">Annuler</button>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="submit">Enregistrer</button>
-        </div>
-      </form>
+  <main class="container">
+    <section class="card">
+      <h2>Bienvenue</h2>
+      <p>MyBiblio est une petite application front‑end qui vous permet de gérer vos livres et vos étagères en utilisant le stockage local (localStorage). Utilisez le menu pour ajouter un livre, afficher la liste par étagère, ou rechercher dans votre bibliothèque.</p>
+      <ul class="home-actions">
+        <li><a class="btn" href="add.html">Ajouter un livre</a></li>
+        <li><a class="btn" href="shelves.html">Voir les livres par étagère</a></li>
+        <li><a class="btn" href="search.html">Rechercher</a></li>
+      </ul>
     </section>
 
-    <section aria-labelledby="library-title" class="card">
-      <h2 id="library-title">Ma bibliothèque</h2>
-      <div class="controls">
-        <button id="exportBtn">Exporter (JSON)</button>
-        <label class="import-label">Importer
-          <input type="file" id="importFile" accept="application/json">
-        </label>
-        <button id="clearBtn">Vider le stockage local</button>
-      </div>
-      <div id="booksList" class="list" aria-live="polite"></div>
+    <section class="card small-card">
+      <h3>Note</h3>
+      <p>Les données sont stockées localement dans votre navigateur. Pensez à utiliser <strong>Exporter</strong> si vous souhaitez conserver ou transférer votre bibliothèque.</p>
     </section>
   </main>
 
-  <footer>
-    <small>Stockage: localStorage — les données sont locales à ce navigateur/appareil.</small>
+  <footer class="site-footer">
+    <div class="container">Stockage: localStorage — les données restent sur cet appareil. &middot; <a href="index.html">Home</a></div>
   </footer>
-
-  <script type="module" src="app.js"></script>
 </body>
 </html>

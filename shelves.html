@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MyBiblio — Par étagère</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
+      <nav class="main-nav" aria-label="Navigation principale">
+        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="add.html" class="nav-link">Ajouter un livre</a>
+        <a href="shelves.html" class="nav-link active">Par étagère</a>
+        <a href="search.html" class="nav-link">Recherche</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container layout-two-columns">
+    <aside class="card sidebar">
+      <h2>Étagères</h2>
+      <ul id="shelvesList" class="shelves-list"></ul>
+    </aside>
+
+    <section class="card main-panel">
+      <h2 id="panelTitle">Tous les livres</h2>
+      <div id="booksByShelf" class="list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container">Stockage: localStorage — les données sont locales à ce navigateur/appareil.</div></footer>
+  <script type="module" src="shelves.js"></script>
+</body>
+</html>
