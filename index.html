@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Bibliothèque Idéale</title>
+    <!-- Tailwind CSS pour un design propre et moderne -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QuaggaJS pour la lecture de code-barres par webcam -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-f-screen">
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- En-tête -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-indigo-600 mb-2">📚 Ma Bibliothèque</h1>
+            <p class="text-slate-500">Scannez ou ajoutez vos livres par ISBN facilement.</p>
+        </header>
+
+        <!-- Zone d'actions -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Ajout par Code Barre / ISBN Manuel -->
+            <div>
+                <h2 class="text-lg font-semibold mb-3 text-slate-700">Ajouter un livre</h2>
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="isbnInput" placeholder="Entrer l'ISBN (ex: 9782070408504)" 
+                        class="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="addBookByISBN()" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl transition font-medium">
+                        Ajouter
+                    </button>
+                </div>
+                <button onclick="toggleScanner()" id="scanBtn"
+                    class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl transition font-medium flex items-center justify-center gap-2">
+                    📷 Scanner avec la caméra
+                </button>
+            </div>
+
+            <!-- Lecteur Caméra (Caché par défaut) -->
+            <div id="scanner-container-wrapper" class="hidden relative bg-black rounded-xl overflow-hidden flex flex-col items-center justify-center">
+                <div id="interactive" class="viewport width-full h-48"></div>
+                <button onclick="toggleScanner()" class="absolute top-2 right-2 bg-white/80 hover:bg-white text-black rounded-full p-1.5 text-xs font-bold">Fermer</button>
+            </div>
+
+            <!-- Statistiques rapides -->
+            <div class="flex flex-col justify-center bg-indigo-50/50 rounded-xl p-4 border border-indigo-100/50">
+                <span class="text-indigo-400 text-sm font-medium">Total de livres dans la bibliothèque</span>
+                <span id="bookCount" class="text-3xl font-bold text-indigo-600">0</span>
+            </div>
+        </div>
+
+        <!-- Liste des livres -->
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-700">Mon Catalogue</h2>
+            <button onclick="clearLibrary()" class="text-sm text-red-500 hover:underline">Tout supprimer</button>
+        </div>
+
+        <div id="bookList" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Les livres s'afficheront ici dynamiquement -->
+        </div>
+        
+        <div id="emptyState" class="text-center py-12 text-slate-400 hidden">
+            Votre bibliothèque est vide pour le moment. Ajoutez votre premier livre !
+        </div>
+    </div>
+
+    <!-- Script Logique -->
+    <script>
+        let library = JSON.parse(localStorage.getItem('my_library')) || [];
+        let scannerIsRunning = false;
+
+        // Initialisation de l'affichage
+        renderLibrary();
+
+        // Fonction pour ajouter un livre via son ISBN
+        async function addBookByISBN() {
+            const input = document.getElementById('isbnInput');
+            const isbn = input.value.trim().replace(/[-\s]/g, '');
+
+            if (!isbn) {
+                alert('Veuillez entrer un code ISBN valide.');
+                return;
+            }
+
+            // Vérifier si le livre existe déjà
+            if (library.some(b => b.isbn === isbn)) {
+                alert('Ce livre est déjà dans votre bibliothèque !');
+                input.value = '';
+                return;
+            }
+
+            // Appel API Open Library
+            try {
+                const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+                const data = await response.json();
+                const bookKey = `ISBN:${isbn}`;
+
+                if (data[bookKey]) {
+                    const bookData = data[bookKey];
+                    const newBook = {
+                        isbn: isbn,
+                        title: bookData.title || 'Titre inconnu',
+                        authors: bookData.authors ? bookData.authors.map(a => a.name).join(', ') : 'Auteur inconnu',
+                        cover: bookData.cover ? bookData.cover.medium : 'https://via.placeholder.com/128x192?text=Pas+de+couverture',
+                        publish_date: bookData.publish_date || ''
+                    };
+
+                    library.push(newBook);
+                    saveAndRefresh();
+                    input.value = '';
+                } else {
+                    alert('Livre introuvable avec cet ISBN.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erreur lors de la récupération des données du livre.');
+            }
+        }
+
+        // Sauvegarder et actualiser l'interface
+        function saveAndRefresh() {
+            localStorage.setItem('my_library', JSON.stringify(library));
+            renderLibrary();
+        }
+
+        // Afficher la liste des livres
+        function renderLibrary() {
+            const container = document.getElementById('bookList');
+            const emptyState = document.getElementById('emptyState');
+            const bookCount = document.getElementById('bookCount');
+            
+            bookCount.textContent = library.length;
+            container.innerHTML = '';
+
+            if (library.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            library.forEach((book, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 items-center relative group";
+                card.innerHTML = `
+                    <img src="${book.cover}" alt="${book.title}" class="w-16 h-24 object-cover rounded-lg shadow-sm bg-slate-100">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-slate-800 truncate">${book.title}</h3>
+                        <p class="text-sm text-slate-500 truncate">${book.authors}</p>
+                        <p class="text-xs text-slate-400 mt-1">ISBN: ${book.isbn}</p>
+                    </div>
+                    <button onclick="removeBook(${index})" class="absolute top-3 right-3 text-slate-300 hover:text-red-500 transition">
+                        ✕
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Supprimer un livre
+        function removeBook(index) {
+            library.splice(index, 1);
+            saveAndRefresh();
+        }
+
+        // Vider toute la bibliothèque
+        function clearLibrary() {
+            if (confirm('Voulez-vous vraiment vider toute votre bibliothèque ?')) {
+                library = [];
+                saveAndRefresh();
+            }
+        }
+
+        // Gestion du Scanner Caméra (QuaggaJS)
+        function toggleScanner() {
+            const wrapper = document.getElementById('scanner-container-wrapper');
+            if (!scannerIsRunning) {
+                wrapper.classList.remove('hidden');
+                scannerIsRunning = true;
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector('#interactive'),
+                        constraints: {
+                            facingMode: "environment" // Utilise la caméra arrière sur mobile
+                        },
+                    },
+                    decoder: {
+                        readers: ["ean_reader"] // Format standard des codes-barres de livres (EAN-13)
+                    }
+                }, function(err) {
+                    if (err) {
+                        console.error(err);
+                        alert("Impossible d'accéder à la caméra.");
+                        scannerIsRunning = false;
+                        wrapper.classList.add('hidden');
+                        return;
+                    }
+                    Quagga.start();
+                });
+
+                Quagga.onDetected(function(result) {
+                    const code = result.codeResult.code;
+                    // Les ISBN-13 commencent généralement par 978 ou 979
+                    if (code.startsWith('978') || code.startsWith('979')) {
+                        document.getElementById('isbnInput').value = code;
+                        toggleScanner(); // Arrête le scanner
+                        addBookByISBN(); // Lance l'ajout automatique
+                    }
+                });
+            } else {
+                Quagga.stop();
+                scannerIsRunning = false;
+                wrapper.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
