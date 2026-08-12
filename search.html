@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Recherche</title>
+  <title>MyBiblio — Recherche (page dédiée)</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="supabase-config.js"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
       <nav class="main-nav" aria-label="Navigation principale">
-        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="index.html" class="nav-link active">Recherche</a>
         <a href="add.html" class="nav-link">Ajouter un livre</a>
         <a href="shelves.html" class="nav-link">Par étagère</a>
-        <a href="search.html" class="nav-link active">Recherche</a>
+        <a href="settings.html" class="nav-link">Paramètres</a>
       </nav>
     </div>
   </header>
@@ -23,7 +24,7 @@
     <section class="card">
       <h2>Recherche</h2>
       <label for="q">Rechercher par titre ou auteur</label>
-      <input id="q" placeholder="Titre ou auteur...">
+      <input id="q" placeholder="Titre, auteur ou ISBN...">
       <div id="searchResults" class="list" aria-live="polite"></div>
     </section>
   </main>
