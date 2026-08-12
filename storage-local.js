@@ -33,7 +33,6 @@ export const LocalStorageAdapter = {
     if(!shelf) throw new Error('Étagère introuvable');
     const trimmed = (newName||'').trim();
     if(!trimmed) throw new Error('Nom requis');
-    // check uniqueness
     const exists = state.shelves.find(s => s.id !== id && s.name.toLowerCase() === trimmed.toLowerCase());
     if(exists) throw new Error('Une autre étagère porte déjà ce nom');
     shelf.name = trimmed;
@@ -43,20 +42,20 @@ export const LocalStorageAdapter = {
   deleteShelf: async (id) => {
     const state = readState();
     state.shelves = state.shelves.filter(s => s.id !== id);
-    // set books' shelfId to null
     state.books = state.books.map(b => ({...b, shelfId: b.shelfId === id ? null : b.shelfId}));
     writeState(state);
   },
   getBooks: async () => {
     return readState().books;
   },
-  createBook: async ({title,author,shelfId=null}) => {
+  createBook: async ({title,author,shelfId=null,isbn=null}) => {
     const state = readState();
     const newBook = {
       id: Date.now().toString(),
       title: (title||'').trim(),
       author: (author||'').trim(),
       shelfId: shelfId || null,
+      isbn: (isbn||null),
       createdAt: new Date().toISOString()
     };
     state.books.push(newBook);
@@ -81,5 +80,9 @@ export const LocalStorageAdapter = {
   },
   clear: async () => {
     localStorage.removeItem(STORAGE_KEY);
-  }
+  },
+  // auth no-ops to keep API compatible with Supabase adapter
+  signIn: async () => { return null; },
+  signOut: async () => { return null; },
+  onAuthChange: async (cb) => { /* no-op */ }
 };
