@@ -1,4 +1,4 @@
-// app.js — main UI logic
+// app.js — main UI logic (étagère obligatoire)
 import { LocalStorageAdapter as Storage } from './storage-local.js';
 
 const dom = {
@@ -64,7 +64,7 @@ dom.addNewShelf.addEventListener('click', async ()=>{
   }
 });
 
-// submit new book
+// submit new book (maintenant exigent une étagère)
 dom.addBookForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   const title = document.getElementById('title').value.trim();
@@ -73,9 +73,10 @@ dom.addBookForm.addEventListener('submit', async (e)=>{
 
   if(!title){ alert('Le titre est requis'); return; }
 
+  // Étagère maintenant obligatoire
   if(!shelfId){
-    const ok = confirm('Aucune étagère sélectionnée. Enregistrer sans étagère ?');
-    if(!ok) return;
+    alert("Veuillez sélectionner une étagère avant d'enregistrer.");
+    return;
   }
 
   try{

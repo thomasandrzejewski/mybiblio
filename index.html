@@ -23,7 +23,8 @@
         <input id="author" name="author">
 
         <label for="shelfSelect">Étagère</label>
-        <select id="shelfSelect" name="shelfId">
+        <!-- L'étagère est maintenant obligatoire -->
+        <select id="shelfSelect" name="shelfId" required aria-required="true">
           <option value="" selected disabled>Choisir une étagère</option>
         </select>
 
