@@ -1,9 +1,13 @@
-// add.js — page-specific logic for add.html (with ISBN lookup)
+// add.js — page-specific logic for add.html (with ISBN lookup and scanner)
 import { LocalStorageAdapter as Storage } from './storage-local.js';
 
 const dom = {
   isbn: document.getElementById('isbn'),
   fetchIsbnBtn: document.getElementById('fetchIsbn'),
+  scanBtn: document.getElementById('scanBtn'),
+  scannerContainer: document.getElementById('scannerContainer'),
+  scannerVideo: document.getElementById('scannerVideo'),
+  stopScanBtn: document.getElementById('stopScan'),
   shelfSelect: document.getElementById('shelfSelect'),
   createShelfBtn: document.getElementById('createShelfBtn'),
   newShelfContainer: document.getElementById('newShelfContainer'),
@@ -11,10 +15,12 @@ const dom = {
   addNewShelf: document.getElementById('addNewShelf'),
   cancelNewShelf: document.getElementById('cancelNewShelf'),
   addBookForm: document.getElementById('addBookForm'),
-  exportBtn: document.getElementById('exportBtn'),
-  importFile: document.getElementById('importFile'),
   clearBtn: document.getElementById('clearBtn')
 };
+
+let _scannerStream = null;
+let _scannerInterval = null;
+let _barcodeDetector = null;
 
 async function fetchShelves(){
   const shelves = await Storage.getShelves();
@@ -98,17 +104,90 @@ dom.fetchIsbnBtn.addEventListener('click', async ()=>{
   }
 });
 
+// Scanner logic using BarcodeDetector if available
+async function startScanner(){
+  if(!_barcodeDetector){
+    // check support
+    if('BarcodeDetector' in window){
+      try{
+        const supportedFormats = await BarcodeDetector.getSupportedFormats();
+        _barcodeDetector = new BarcodeDetector({formats: supportedFormats});
+      }catch(e){
+        // ignore and fallback
+        _barcodeDetector = null;
+      }
+    }
+  }
+
+  if(!_barcodeDetector){
+    alert('Scanner non pris en charge par ce navigateur.');
+    return;
+  }
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    _scannerStream = stream;
+    dom.scannerVideo.srcObject = stream;
+    dom.scannerContainer.classList.remove('hidden');
+    dom.scanBtn.disabled = true;
+
+    _scannerInterval = setInterval(async ()=>{
+      try{
+        const barcodes = await _barcodeDetector.detect(dom.scannerVideo);
+        if(barcodes && barcodes.length){
+          const code = barcodes[0].rawValue;
+          if(code){
+            dom.isbn.value = code;
+            stopScanner();
+            // try to lookup
+            try{
+              const info = await lookupISBN(code);
+              if(info.title) document.getElementById('title').value = info.title;
+              if(info.authors) document.getElementById('author').value = info.authors;
+              alert('ISBN scanné et données pré-remplies.');
+            }catch(err){
+              alert('ISBN scanné: ' + code + ' (pas de métadonnées trouvées)');
+            }
+          }
+        }
+      }catch(err){
+        // ignore detection errors
+        // console.error(err);
+      }
+    }, 500);
+  }catch(err){
+    alert('Impossible d\'accéder à la caméra: ' + err.message);
+    stopScanner();
+  }
+}
+
+function stopScanner(){
+  if(_scannerInterval){ clearInterval(_scannerInterval); _scannerInterval = null; }
+  if(_scannerStream){
+    _scannerStream.getTracks().forEach(t => t.stop());
+    _scannerStream = null;
+  }
+  dom.scannerVideo.srcObject = null;
+  dom.scannerContainer.classList.add('hidden');
+  dom.scanBtn.disabled = false;
+}
+
+dom.scanBtn.addEventListener('click', ()=>{ startScanner().catch(err=>{ alert(err.message || 'Erreur scanner'); }); });
+dom.stopScanBtn.addEventListener('click', ()=>{ stopScanner(); });
+
 // submit new book (shelf required)
 dom.addBookForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   const title = document.getElementById('title').value.trim();
   const author = document.getElementById('author').value.trim();
   const shelfId = dom.shelfSelect.value || null;
+  const isbnVal = (dom.isbn.value||'').trim();
 
   if(!title){ alert('Le titre est requis'); return; }
   if(!shelfId){ alert("Veuillez sélectionner une étagère avant d'enregistrer."); return; }
 
   try{
+    // include isbn if present by extending createBook signature later if desired
     await Storage.createBook({title,author,shelfId});
     dom.addBookForm.reset();
     dom.shelfSelect.value = '';
@@ -118,32 +197,7 @@ dom.addBookForm.addEventListener('submit', async (e)=>{
   }
 });
 
-// export / import
-dom.exportBtn.addEventListener('click', async ()=>{
-  const data = await Storage.exportData();
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'mybiblio-export.json';
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-});
-
-dom.importFile && dom.importFile.addEventListener('change', async (e)=>{
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  try{
-    const txt = await file.text();
-    const data = JSON.parse(txt);
-    await Storage.importData(data);
-    await fetchShelves();
-    alert('Import terminé');
-  }catch(err){
-    alert('Échec de l\'import: ' + err.message);
-  }finally{
-    e.target.value = '';
-  }
-});
-
+// clear storage
 dom.clearBtn && dom.clearBtn.addEventListener('click', async ()=>{
   if(!confirm('Cette action supprime les données stockées localement. Continuer ?')) return;
   await Storage.clear();
