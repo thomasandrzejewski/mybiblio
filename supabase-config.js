@@ -1,1 +1,1 @@
-window.SUPABASE_URL = 'https://your-project-ref.supabase.co'; window.SUPABASE_ANON_KEY = 'sb_publishable_Wb2ynbu0lWtY4tv6LpKHSg_8ymdFeJo'
+window.SUPABASE_URL = 'https://kgfndlsxgfcurlfyhsrb.supabase.co'; window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZm5kbHN4Z2ZjdXJsZnloc3JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NDQ1MjIsImV4cCI6MjEwMjEyMDUyMn0.H3bENWHuaROha_8bQ4xU1K50sLrUVZLJzKpvTz08Ax8'
