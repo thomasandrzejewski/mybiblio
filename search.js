@@ -1,5 +1,5 @@
 // search.js — simple client-side search over title, author and ISBN with delete
-import { LocalStorageAdapter as Storage } from './storage-local.js';
+import { Storage } from './storage.js';
 
 const q = document.getElementById('q');
 const results = document.getElementById('searchResults');
