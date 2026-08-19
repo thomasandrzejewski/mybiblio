@@ -40,3 +40,12 @@ export const Storage = {
   signOut: proxyMethod('signOut'),
   onAuthChange: proxyMethod('onAuthChange')
 };
+
+// Expose Storage on window for easier debugging in the browser console
+if (typeof window !== 'undefined') {
+  try {
+    window.Storage = Storage;
+  } catch (e) {
+    // ignore
+  }
+}
