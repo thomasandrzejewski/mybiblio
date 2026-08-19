@@ -41,10 +41,13 @@ export const Storage = {
   onAuthChange: proxyMethod('onAuthChange')
 };
 
-// Expose Storage on window for easier debugging in the browser console
+// Expose Storage on a unique window name for easier debugging in the browser console
+// We avoid using `window.Storage` because browsers already define a native Storage interface.
 if (typeof window !== 'undefined') {
   try {
-    window.Storage = Storage;
+    window.MyBiblioStorage = Storage;
+    // also expose an alternate name for compatibility/debugging
+    window.__MYBIBLIO_STORAGE__ = Storage;
   } catch (e) {
     // ignore
   }
