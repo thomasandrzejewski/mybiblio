@@ -14,6 +14,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   realtime: { params: { eventsPerSecond: 10 } }
 });
 
+// Helper function to verify authentication
+async function ensureAuthenticated() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    throw new Error('Authentification requise. Veuillez vous connecter pour continuer.');
+  }
+  return user;
+}
+
 export const SupabaseAdapter = {
   // Shelves
   getShelves: async () => {
@@ -22,6 +31,7 @@ export const SupabaseAdapter = {
     return data;
   },
   createShelf: async (name) => {
+    await ensureAuthenticated();
     const trimmed = (name || '').trim();
     if (!trimmed) throw new Error('Nom requis');
     // try insert; unique constraint in DB should prevent duplicates
@@ -30,6 +40,7 @@ export const SupabaseAdapter = {
     return data;
   },
   updateShelf: async (id, newName) => {
+    await ensureAuthenticated();
     const trimmed = (newName || '').trim();
     if (!trimmed) throw new Error('Nom requis');
     const { data, error } = await supabase.from('shelves').update({ name: trimmed }).eq('id', id).select().single();
@@ -37,6 +48,7 @@ export const SupabaseAdapter = {
     return data;
   },
   deleteShelf: async (id) => {
+    await ensureAuthenticated();
     const { error } = await supabase.from('shelves').delete().eq('id', id);
     if (error) throw error;
     // books' shelf_id handling should be managed by DB foreign key (ON DELETE SET NULL)
@@ -48,6 +60,7 @@ export const SupabaseAdapter = {
     return data;
   },
   createBook: async ({ title, author, shelfId = null, isbn = null }) => {
+    await ensureAuthenticated();
     if (!title || !title.trim()) throw new Error('Titre requis');
     const payload = { title: title.trim(), author: (author || '').trim(), shelf_id: shelfId || null, isbn: isbn || null };
     const { data, error } = await supabase.from('books').insert(payload).select().single();
@@ -55,6 +68,7 @@ export const SupabaseAdapter = {
     return data;
   },
   deleteBook: async (id) => {
+    await ensureAuthenticated();
     const { error } = await supabase.from('books').delete().eq('id', id);
     if (error) throw error;
   },
@@ -67,6 +81,7 @@ export const SupabaseAdapter = {
     return { shelves: shelvesResp.data, books: booksResp.data };
   },
   importData: async (data) => {
+    await ensureAuthenticated();
     if (!data || (!Array.isArray(data.shelves) && !Array.isArray(data.books))) throw new Error('Données invalides');
     // naive import: upsert shelves (by name), then insert books mapping shelf names to ids
     const trx = []; // no transactions in supabase client in browser; do best effort
@@ -84,6 +99,7 @@ export const SupabaseAdapter = {
     return true;
   },
   clear: async () => {
+    await ensureAuthenticated();
     // delete books then shelves
     let resp = await supabase.from('books').delete().neq('id', '');
     if (resp.error) throw resp.error;
