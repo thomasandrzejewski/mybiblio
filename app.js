@@ -1,5 +1,5 @@
 // app.js — main UI logic (étagère obligatoire)
-import { LocalStorageAdapter as Storage } from './storage-local.js';
+import { Storage } from './storage.js';
 
 const dom = {
   shelfSelect: document.getElementById('shelfSelect'),
