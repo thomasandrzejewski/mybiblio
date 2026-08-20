@@ -1,5 +1,5 @@
 // shelves.js — list books grouped by shelf with edit & delete
-import { LocalStorageAdapter as Storage } from './storage-local.js';
+import { Storage } from './storage.js';
 
 const shelvesList = document.getElementById('shelvesList');
 const booksByShelf = document.getElementById('booksByShelf');
