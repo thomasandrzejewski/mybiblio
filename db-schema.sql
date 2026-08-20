@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS books (
   title text NOT NULL,
   author text,
   isbn text,
+  status text,
   shelf_id uuid REFERENCES shelves(id) ON DELETE SET NULL,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
