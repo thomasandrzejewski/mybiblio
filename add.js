@@ -1,5 +1,5 @@
 // add.js — page-specific logic for add.html (with ISBN lookup and scanner)
-import { LocalStorageAdapter as Storage } from './storage-local.js';
+import { Storage } from './storage.js';
 
 const dom = {
   isbn: document.getElementById('isbn'),
