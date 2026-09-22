@@ -4,35 +4,51 @@ const initialShelves = [
   { id: 'romans', name: 'Romans', color: '#0f766e' }
 ];
 
-const initialBooks = [
-  { id: 'book-1', title: 'Le Petit Prince', author: 'Antoine de Saint-Exupéry', status: 'read', shelfId: 'classiques' },
-  { id: 'book-2', title: 'Dune', author: 'Frank Herbert', status: 'reading', shelfId: 'science-fiction' },
-  { id: 'book-3', title: 'L’Étranger', author: 'Albert Camus', status: 'to-read', shelfId: 'classiques' },
-  { id: 'book-4', title: 'La Horde du Contrevent', author: 'Alain Damasio', status: 'to-read', shelfId: 'romans' }
-];
+export const statusLabels = { reading: 'En cours', read: 'Lu', 'to-read': 'À lire' };
+let user;
 
-export const statusLabels = {
-  reading: 'En cours',
-  read: 'Lu',
-  'to-read': 'À lire'
-};
-
-export function loadLibrary() {
-  try {
-    const saved = localStorage.getItem('mybiblio-library');
-    if (saved) return JSON.parse(saved);
-  } catch (error) {
-    console.warn('Bibliothèque locale illisible, utilisation des données initiales.', error);
+export async function loadLibrary(supabase, currentUser) {
+  user = currentUser;
+  const [{ data: shelves, error: shelvesError }, { data: books, error: booksError }] = await Promise.all([
+    supabase.from('shelves').select('*').order('created_at'),
+    supabase.from('books').select('*').order('created_at', { ascending: false })
+  ]);
+  if (shelvesError) throw shelvesError;
+  if (booksError) throw booksError;
+  if (!shelves.length && !books.length) {
+    const { data, error } = await supabase.from('shelves').insert(initialShelves.map(({ id, ...shelf }) => ({ ...shelf, user_id: user.id }))).select();
+    if (error) throw error;
+    return { shelves: data, books: [] };
   }
-  return { books: initialBooks, shelves: initialShelves };
+  return { shelves, books };
 }
 
-export function saveLibrary(library) {
-  localStorage.setItem('mybiblio-library', JSON.stringify(library));
+export async function createShelf(supabase, name) {
+  const { data, error } = await supabase.from('shelves').insert({ user_id: user.id, name, color: '#334155' }).select().single();
+  if (error) throw error;
+  return data;
 }
 
-export function resetLibrary() {
-  const library = { books: initialBooks, shelves: initialShelves };
-  saveLibrary(library);
-  return library;
+export async function deleteShelf(supabase, id) {
+  const { error } = await supabase.from('shelves').delete().eq('id', id);
+  if (error) throw error;
+}
+
+export async function createBook(supabase, book) {
+  const { data, error } = await supabase.from('books').insert({ ...book, user_id: user.id }).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteBook(supabase, id) {
+  const { error } = await supabase.from('books').delete().eq('id', id);
+  if (error) throw error;
+}
+
+export async function resetLibrary(supabase) {
+  const { error } = await supabase.from('books').delete().eq('user_id', user.id);
+  if (error) throw error;
+  const { error: shelfError } = await supabase.from('shelves').delete().eq('user_id', user.id);
+  if (shelfError) throw shelfError;
+  return loadLibrary(supabase, user);
 }
