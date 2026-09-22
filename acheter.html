@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — À acheter</title><link rel="stylesheet" href="styles.css"></head>
+<body data-page="buy">
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a><nav aria-label="Navigation principale"><a data-nav="search" href="index.html">Bibliothèque</a><a data-nav="shelves" href="shelves.html">Étagères</a><a data-nav="add" href="add.html">Ajouter</a><a data-nav="buy" href="acheter.html">À acheter</a><a data-nav="settings" href="settings.html">Réglages</a></nav></div></header>
+  <main class="container narrow purchase-page main-content">
+    <a class="back-link" href="index.html">← Retour à la bibliothèque</a>
+    <section class="page-intro"><p class="eyebrow">VOTRE LISTE</p><h1>À acheter</h1><p class="intro">Gardez sous la main les livres que vous aimeriez ajouter à votre bibliothèque.</p></section>
+    <form id="purchase-form" class="purchase-form">
+      <div class="field"><label for="purchase-title">Nom du livre</label><input id="purchase-title" name="title" required maxlength="160" placeholder="Ex. Une chambre à soi"></div>
+      <div class="field"><label for="purchase-author">Auteur</label><input id="purchase-author" name="author" maxlength="120" placeholder="Ex. Virginia Woolf"></div>
+      <div class="field"><label for="purchase-comment">Commentaire</label><input id="purchase-comment" name="comment" maxlength="300" placeholder="Pourquoi souhaitez-vous le lire ?"></div>
+      <button class="button-primary" type="submit">Ajouter</button>
+      <p id="purchase-message" class="form-message" role="status" aria-live="polite"></p>
+    </form>
+    <section aria-labelledby="purchase-list-title"><div class="section-heading"><div><p class="eyebrow">VOS ENVIES DE LECTURE</p><h2 id="purchase-list-title">Livres à acheter</h2></div><span id="purchase-count" class="muted"></span></div><div class="purchase-table-wrap"><table class="purchase-table"><thead><tr><th>Nom du livre</th><th>Auteur</th><th>Commentaire</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="purchase-list"></tbody></table></div></section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
