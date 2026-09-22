@@ -1,37 +1,4 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Paramètres</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="supabase-config.js"></script>
-</head>
-<body>
-  <header class="site-header">
-    <div class="container">
-      <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
-      <nav class="main-nav" aria-label="Navigation principale">
-        <a href="index.html" class="nav-link">Recherche</a>
-        <a href="add.html" class="nav-link">Ajouter un livre</a>
-        <a href="shelves.html" class="nav-link">Par étagère</a>
-        <a href="settings.html" class="nav-link active">Paramètres</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="card">
-      <h2>Paramètres</h2>
-      <p>Gérer votre bibliothèque Supabase.</p>
-      <div class="controls">
-        <button id="clearBtn" class="secondary">Vider la base de données</button>
-      </div>
-      <p class="muted">Attention: cette action supprimera tous vos livres et étagères stockés dans Supabase. Cette action est irréversible.</p>
-    </section>
-  </main>
-
-  <footer class="site-footer"><div class="container">Stockage: Supabase — les données sont stockées dans la base de données cloud.</div></footer>
-  <script type="module" src="settings.js"></script>
-</body>
-</html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — Paramètres</title><link rel="stylesheet" href="styles.css"></head>
+<body data-page="settings"><header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a><nav aria-label="Navigation principale"><a data-nav="search" href="index.html">Rechercher</a><a data-nav="add" href="add.html">Ajouter un livre</a><a data-nav="shelves" href="shelves.html">Mes étagères</a><a data-nav="settings" href="settings.html">Paramètres</a></nav></div></header><main class="container narrow main-content"><section class="page-intro"><p class="eyebrow">CONFIGURATION</p><h1>Paramètres</h1><p>Personnalisez l’organisation de votre bibliothèque.</p></section><section class="settings-card"><div class="section-heading"><div><h2>Mes étagères</h2><p>Créez des catégories adaptées à vos livres.</p></div></div><ul id="settings-shelves" class="settings-list"></ul><form id="new-shelf-form" class="inline-form"><input id="new-shelf" placeholder="Nom de la nouvelle étagère"><button class="secondary-button" type="submit">Ajouter</button></form></section><section class="settings-card"><h2>Données</h2><p>Cette version fonctionne sans base de données. Les changements sont enregistrés localement dans ce navigateur.</p><button id="reset-library" class="text-button danger">Réinitialiser les données de démonstration</button></section></main><footer class="site-footer"><div class="container">MyBiblio · Vos données restent dans votre navigateur.</div></footer><script type="module" src="app.js"></script></body></html>

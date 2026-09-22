@@ -1,37 +1,8 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Recherche</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="supabase-config.js"></script>
-  <script type="module">import './storage.js';</script>
-</head>
-<body>
-  <header class="site-header">
-    <div class="container">
-      <h1 class="brand"><a href="index.html">MyBiblio</a></h1>
-      <nav class="main-nav" aria-label="Navigation principale">
-        <a href="index.html" class="nav-link active">Recherche</a>
-        <a href="add.html" class="nav-link">Ajouter un livre</a>
-        <a href="shelves.html" class="nav-link">Par étagère</a>
-        <a href="settings.html" class="nav-link">Paramètres</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="card">
-      <h2>Recherche</h2>
-      <label for="q">Rechercher par titre ou auteur</label>
-      <input id="q" placeholder="Titre, auteur ou ISBN...">
-      <div id="searchResults" class="list" aria-live="polite"></div>
-    </section>
-  </main>
-
-  <footer class="site-footer"><div class="container">Stockage: localStorage — les données sont locales à ce navigateur/appareil.</div></footer>
-  <script type="module" src="search.js"></script>
-  <script src="debug-auth.js" type="module"></script>
-</body>
-</html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — Ma bibliothèque</title><link rel="stylesheet" href="styles.css"></head>
+<body data-page="search">
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a><nav aria-label="Navigation principale"><a data-nav="search" href="index.html">Rechercher</a><a data-nav="add" href="add.html">Ajouter un livre</a><a data-nav="shelves" href="shelves.html">Mes étagères</a><a data-nav="settings" href="settings.html">Paramètres</a></nav></div></header>
+  <main class="container main-content"><section class="hero"><p class="eyebrow">VOTRE BIBLIOTHÈQUE, EN UN COUP D’ŒIL</p><h1>Retrouvez votre<br><em>prochaine lecture.</em></h1><p class="intro">Tous vos livres, soigneusement rangés au même endroit.</p><div class="search-box"><span>⌕</span><input id="search-input" type="search" placeholder="Rechercher un titre, un auteur..." autofocus></div><div class="search-footer"><span id="result-count"></span><a class="small-link" href="add.html">+ Ajouter un livre</a></div></section><section class="section-heading"><div><p class="eyebrow">VOTRE COLLECTION</p><h2>Livres récents</h2></div><span id="book-count" class="count-pill"></span></section><section id="search-results" class="book-grid" aria-live="polite"></section></main>
+  <footer class="site-footer"><div class="container">MyBiblio · Vos données restent dans votre navigateur.</div></footer><script type="module" src="app.js"></script>
+</body></html>

@@ -1,150 +1,96 @@
-// app.js — main UI logic (étagère obligatoire)
-import { Storage } from './storage.js';
+import { loadLibrary, saveLibrary, resetLibrary, statusLabels } from './data.js';
 
-const dom = {
-  shelfSelect: document.getElementById('shelfSelect'),
-  createShelfBtn: document.getElementById('createShelfBtn'),
-  newShelfContainer: document.getElementById('newShelfContainer'),
-  newShelfName: document.getElementById('newShelfName'),
-  addNewShelf: document.getElementById('addNewShelf'),
-  cancelNewShelf: document.getElementById('cancelNewShelf'),
-  addBookForm: document.getElementById('addBookForm'),
-  booksList: document.getElementById('booksList'),
-  exportBtn: document.getElementById('exportBtn'),
-  importFile: document.getElementById('importFile'),
-  clearBtn: document.getElementById('clearBtn')
-};
+const page = document.body.dataset.page;
+let library = loadLibrary();
 
-async function fetchShelves(){
-  const shelves = await Storage.getShelves();
-  populateShelves(shelves);
+const $ = (selector) => document.querySelector(selector);
+const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+const shelfName = (id) => library.shelves.find((shelf) => shelf.id === id)?.name || 'Sans étagère';
+
+function persist() {
+  saveLibrary(library);
 }
 
-function populateShelves(shelves){
-  const sel = dom.shelfSelect;
-  // keep the placeholder option (value=="") and remove others
-  sel.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
-  shelves.sort((a,b)=>a.name.localeCompare(b.name));
-  for(const s of shelves){
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.name;
-    sel.appendChild(opt);
-  }
+function bookCard(book, options = {}) {
+  const shelf = library.shelves.find((item) => item.id === book.shelfId);
+  return `<article class="book-card">
+    <div class="book-cover" style="--cover:${shelf?.color || '#334155'}">${escapeHtml(book.title.slice(0, 1).toUpperCase())}</div>
+    <div class="book-info">
+      <h3>${escapeHtml(book.title)}</h3>
+      <p class="author">${escapeHtml(book.author || 'Auteur inconnu')}</p>
+      <div class="book-meta"><span class="status status-${book.status}">${statusLabels[book.status]}</span><span>${escapeHtml(shelfName(book.shelfId))}</span></div>
+      ${options.delete ? `<button class="text-button danger" data-delete-book="${book.id}">Supprimer</button>` : ''}
+    </div>
+  </article>`;
 }
 
-// show/hide new shelf form
-dom.createShelfBtn.addEventListener('click', ()=>{
-  dom.newShelfContainer.classList.remove('hidden');
-  dom.newShelfName.focus();
-});
-
-dom.cancelNewShelf.addEventListener('click', ()=>{
-  dom.newShelfContainer.classList.add('hidden');
-  dom.newShelfName.value = '';
-});
-
-// create shelf inline
-dom.addNewShelf.addEventListener('click', async ()=>{
-  const name = (dom.newShelfName.value||'').trim();
-  if(!name) return alert('Nom requis');
-  try{
-    const shelf = await Storage.createShelf(name);
-    await fetchShelves();
-    // select the new shelf
-    for(const opt of dom.shelfSelect.options){
-      if(opt.textContent.toLowerCase() === shelf.name.toLowerCase()){
-        opt.selected = true; break;
-      }
-    }
-    dom.newShelfContainer.classList.add('hidden');
-    dom.newShelfName.value = '';
-  }catch(err){
-    alert(err.message || 'Erreur');
-  }
-});
-
-// submit new book (maintenant exigent une étagère)
-dom.addBookForm.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const title = document.getElementById('title').value.trim();
-  const author = document.getElementById('author').value.trim();
-  const shelfId = dom.shelfSelect.value || null;
-
-  if(!title){ alert('Le titre est requis'); return; }
-
-  // Étagère maintenant obligatoire
-  if(!shelfId){
-    alert("Veuillez sélectionner une étagère avant d'enregistrer.");
-    return;
-  }
-
-  try{
-    await Storage.createBook({title,author,shelfId});
-    dom.addBookForm.reset();
-    // keep placeholder selected
-    dom.shelfSelect.value = '';
-    renderBooks();
-    alert('Livre ajouté');
-  }catch(err){
-    alert(err.message || 'Erreur lors de l\'enregistrement');
-  }
-});
-
-async function renderBooks(){
-  const books = await Storage.getBooks();
-  const shelves = await Storage.getShelves();
-  const shelfById = new Map(shelves.map(s=>[s.id,s]));
-  const container = dom.booksList;
-  container.innerHTML = '';
-  if(books.length === 0){ container.textContent = 'Aucun livre pour le moment.'; return; }
-  for(const b of books.slice().reverse()){
-    const div = document.createElement('div');
-    div.className = 'book';
-    const h3 = document.createElement('h3'); h3.textContent = b.title; div.appendChild(h3);
-    const p1 = document.createElement('p'); p1.textContent = b.author ? `Auteur: ${b.author}` : 'Auteur: —'; div.appendChild(p1);
-    const shelf = b.shelfId ? (shelfById.get(b.shelfId)?.name || 'Inconnue') : 'Sans étagère';
-    const p2 = document.createElement('p'); p2.textContent = `Étagère: ${shelf}`; div.appendChild(p2);
-    container.appendChild(div);
-  }
+function renderNav() {
+  document.querySelectorAll('[data-nav]').forEach((link) => link.classList.toggle('active', link.dataset.nav === page));
+  const count = $('#book-count');
+  if (count) count.textContent = `${library.books.length} livre${library.books.length > 1 ? 's' : ''}`;
 }
 
-// export / import
-dom.exportBtn.addEventListener('click', async ()=>{
-  const data = await Storage.exportData();
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'mybiblio-export.json';
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-});
+function renderSearch() {
+  const input = $('#search-input');
+  const results = $('#search-results');
+  const render = () => {
+    const query = input.value.trim().toLowerCase();
+    const books = library.books.filter((book) => !query || `${book.title} ${book.author} ${shelfName(book.shelfId)}`.toLowerCase().includes(query));
+    results.innerHTML = books.length ? books.map((book) => bookCard(book)).join('') : '<div class="empty-state"><strong>Aucun livre trouvé</strong><p>Essayez un autre titre ou auteur.</p></div>';
+    $('#result-count').textContent = `${books.length} résultat${books.length > 1 ? 's' : ''}`;
+  };
+  input.addEventListener('input', render);
+  render();
+}
 
-dom.importFile.addEventListener('change', async (e)=>{
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  try{
-    const txt = await file.text();
-    const data = JSON.parse(txt);
-    await Storage.importData(data);
-    await fetchShelves();
-    await renderBooks();
-    alert('Import terminé');
-  }catch(err){
-    alert('Échec de l\'import: ' + err.message);
-  }finally{
-    e.target.value = '';
-  }
-});
+function fillShelves(select) {
+  select.innerHTML = '<option value="">Choisir une étagère</option>' + library.shelves.map((shelf) => `<option value="${shelf.id}">${escapeHtml(shelf.name)}</option>`).join('');
+}
 
-// clear storage
-dom.clearBtn.addEventListener('click', async ()=>{
-  if(!confirm('Cette action supprime les données stockées localement. Continuer ?')) return;
-  await Storage.clear();
-  await fetchShelves();
-  await renderBooks();
-});
+function renderAdd() {
+  fillShelves($('#book-shelf'));
+  $('#add-book-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const title = form.get('title').trim();
+    if (!title) return;
+    library.books.unshift({ id: `book-${Date.now()}`, title, author: form.get('author').trim(), status: form.get('status'), shelfId: form.get('shelf') });
+    persist();
+    event.currentTarget.reset();
+    $('#form-message').textContent = 'Livre ajouté à votre bibliothèque.';
+    $('#form-message').className = 'form-message success';
+    renderNav();
+  });
+}
 
-// initial load
-fetchShelves().then(renderBooks).catch(err=>{
-  console.error(err);
-});
+function renderShelves() {
+  const shelfList = $('#shelf-list');
+  const booksPanel = $('#shelf-books');
+  const render = (shelfId = 'all') => {
+    const books = shelfId === 'all' ? library.books : library.books.filter((book) => book.shelfId === shelfId);
+    const title = shelfId === 'all' ? 'Tous les livres' : shelfName(shelfId);
+    $('#shelf-title').textContent = title;
+    $('#shelf-subtitle').textContent = `${books.length} livre${books.length > 1 ? 's' : ''}`;
+    booksPanel.innerHTML = books.length ? books.map((book) => bookCard(book, { delete: true })).join('') : '<div class="empty-state"><strong>Cette étagère est vide</strong><p>Ajoutez un livre pour la remplir.</p></div>';
+    shelfList.querySelectorAll('[data-shelf]').forEach((item) => item.classList.toggle('selected', item.dataset.shelf === shelfId));
+  };
+  shelfList.innerHTML = `<button class="shelf-item selected" data-shelf="all"><span>Toute la bibliothèque</span><b>${library.books.length}</b></button>` + library.shelves.map((shelf) => `<button class="shelf-item" data-shelf="${shelf.id}"><span><i style="background:${shelf.color}"></i>${escapeHtml(shelf.name)}</span><b>${library.books.filter((book) => book.shelfId === shelf.id).length}</b></button>`).join('');
+  shelfList.addEventListener('click', (event) => { const item = event.target.closest('[data-shelf]'); if (item) render(item.dataset.shelf); });
+  booksPanel.addEventListener('click', (event) => { const button = event.target.closest('[data-delete-book]'); if (!button || !confirm('Supprimer ce livre ?')) return; library.books = library.books.filter((book) => book.id !== button.dataset.deleteBook); persist(); renderNav(); render(); });
+  render();
+}
+
+function renderSettings() {
+  const list = $('#settings-shelves');
+  const render = () => { list.innerHTML = library.shelves.map((shelf) => `<li><span><i style="background:${shelf.color}"></i>${escapeHtml(shelf.name)}</span><button class="text-button danger" data-delete-shelf="${shelf.id}">Supprimer</button></li>`).join(''); };
+  $('#new-shelf-form').addEventListener('submit', (event) => { event.preventDefault(); const input = $('#new-shelf'); const name = input.value.trim(); if (!name || library.shelves.some((shelf) => shelf.name.toLowerCase() === name.toLowerCase())) return; library.shelves.push({ id: `shelf-${Date.now()}`, name, color: '#2563eb' }); input.value = ''; persist(); render(); });
+  list.addEventListener('click', (event) => { const button = event.target.closest('[data-delete-shelf]'); if (!button || !confirm('Supprimer cette étagère ? Les livres seront conservés sans étagère.')) return; library.shelves = library.shelves.filter((shelf) => shelf.id !== button.dataset.deleteShelf); library.books = library.books.map((book) => book.shelfId === button.dataset.deleteShelf ? { ...book, shelfId: '' } : book); persist(); render(); });
+  $('#reset-library').addEventListener('click', () => { if (confirm('Réinitialiser toute la bibliothèque avec les données de démonstration ?')) { library = resetLibrary(); render(); renderNav(); } });
+  render();
+}
+
+renderNav();
+if (page === 'search') renderSearch();
+if (page === 'add') renderAdd();
+if (page === 'shelves') renderShelves();
+if (page === 'settings') renderSettings();
