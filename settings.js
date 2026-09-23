@@ -30,16 +30,40 @@ function renderNav() {
 function renderShelves() {
   list.innerHTML = library.shelves.length
     ? library.shelves.map((shelf) => `
-      <li class="settings-shelf-row" data-shelf-id="${shelf.id}">
-        <span class="shelf-color" style="background:${escapeHtml(shelf.color || '#334155')}"></span>
-        <form class="rename-shelf-form">
-          <label class="sr-only" for="shelf-name-${shelf.id}">Nom de l’étagère</label>
-          <input id="shelf-name-${shelf.id}" name="name" value="${escapeHtml(shelf.name)}" required maxlength="80">
+      <li class="settings-shelf-row" data-shelf-id="${escapeHtml(shelf.id)}">
+        <span class="shelf-color" style="background:${escapeHtml(shelf.color || '#334155')}" aria-hidden="true"></span>
+        <span class="shelf-name">${escapeHtml(shelf.name)}</span>
+        <form class="rename-shelf-form" hidden>
+          <label class="sr-only" for="shelf-name-${escapeHtml(shelf.id)}">Nom de l’étagère</label>
+          <input id="shelf-name-${escapeHtml(shelf.id)}" name="name" value="${escapeHtml(shelf.name)}" required maxlength="80">
           <button class="secondary-button" type="submit">Enregistrer</button>
+          <button class="text-button" type="button" data-cancel-rename>Annuler</button>
         </form>
-        <button class="text-button danger" type="button" data-delete-shelf>Supprimer</button>
+        <span class="shelf-actions">
+          <button class="text-button" type="button" data-edit-shelf aria-label="Modifier ${escapeHtml(shelf.name)}" title="Modifier">✎</button>
+          <button class="text-button danger" type="button" data-delete-shelf>Supprimer</button>
+        </span>
       </li>`).join('')
     : '<li class="muted">Aucune étagère pour le moment.</li>';
+
+  list.querySelectorAll('[data-edit-shelf]').forEach((button) => button.addEventListener('click', (event) => {
+    const row = event.currentTarget.closest('[data-shelf-id]');
+    const name = row.querySelector('.shelf-name');
+    const form = row.querySelector('.rename-shelf-form');
+    const actions = row.querySelector('.shelf-actions');
+    name.hidden = true;
+    form.hidden = false;
+    actions.hidden = true;
+    form.querySelector('input').focus();
+    form.querySelector('input').select();
+  }));
+
+  list.querySelectorAll('[data-cancel-rename]').forEach((button) => button.addEventListener('click', (event) => {
+    const row = event.currentTarget.closest('[data-shelf-id]');
+    row.querySelector('.rename-shelf-form').hidden = true;
+    row.querySelector('.shelf-name').hidden = false;
+    row.querySelector('.shelf-actions').hidden = false;
+  }));
 
   list.querySelectorAll('.rename-shelf-form').forEach((form) => form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -50,6 +74,7 @@ function renderShelves() {
     try {
       const updated = await updateShelf(supabase, shelf.id, name);
       shelf.name = updated.name;
+      renderShelves();
       setMessage('Étagère renommée.');
     } catch (error) {
       console.error(error);
