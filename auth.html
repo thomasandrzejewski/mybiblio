@@ -1,3 +1,37 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — Connexion</title><link rel="stylesheet" href="styles.css"></head>
-<body><main class="container narrow main-content"><section class="page-intro"><p class="eyebrow">MYBIBLIO</p><h1>Connexion</h1><p>Connectez-vous pour retrouver vos livres et vos étagères sur tous vos appareils.</p></section><form id="auth-form" class="form-card"><label for="email">Email</label><input id="email" type="email" required autocomplete="email"><label for="password">Mot de passe</label><input id="password" type="password" required minlength="6" autocomplete="current-password"><button class="primary-button" type="submit">Se connecter</button><button id="signup" class="secondary-button" type="button">Créer un compte</button><p id="auth-message" role="status"></p></form></main><script type="module" src="auth.js"></script></body></html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MyBiblio — Connexion</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container narrow main-content">
+      <section class="page-intro">
+        <p class="eyebrow">MYBIBLIO</p>
+        <h1>Connexion</h1>
+        <p>Connectez-vous pour retrouver vos livres et vos étagères.</p>
+      </section>
+
+      <form id="auth-form" class="form-card">
+        <label for="email">Email</label>
+        <input id="email" type="email" required autocomplete="email" />
+
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" required minlength="6" autocomplete="current-password" />
+
+        <button class="primary-button" type="submit">Se connecter</button>
+
+        <p class="helper-text">
+          Pas encore de compte ?
+          <a href="signup.html">Créer un compte</a>
+        </p>
+
+        <p id="auth-message" role="status"></p>
+      </form>
+    </main>
+
+    <script type="module" src="auth.js"></script>
+  </body>
+</html>
