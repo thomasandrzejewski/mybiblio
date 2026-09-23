@@ -1,0 +1,63 @@
+/* Book list presentation modes. Search filtering remains handled only by the search input. */
+.view-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: -8px 0 18px;
+}
+.view-controls-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.view-controls-buttons {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+.view-controls button {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 0.82rem;
+}
+.view-controls button:hover,
+.view-controls button:focus-visible,
+.view-controls button.is-selected {
+  color: var(--green);
+  background: var(--mint);
+}
+
+/* Detailed mode always places the book text below its cover. */
+.view-detailed .book-card {
+  display: flex;
+  flex-direction: column;
+}
+.view-detailed .book-card .book-cover {
+  width: 100%;
+}
+.view-detailed .book-card .book-info {
+  width: 100%;
+}
+
+/* Reduced mode deliberately removes the cover while keeping all book text. */
+.view-compact .book-card {
+  min-height: 0;
+}
+.view-compact .book-card .book-cover {
+  display: none;
+}
+.view-compact .book-card .book-info {
+  padding: 18px;
+}
+
+@media (max-width: 600px) {
+  .view-controls {
+    justify-content: space-between;
+  }
+}
