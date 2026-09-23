@@ -6,9 +6,12 @@ export const supabase = createClient(
 );
 
 export async function currentUser() {
-  const { data, error } = await supabase.auth.getUser();
+  // getUser() throws AuthSessionMissingError when the visitor is not logged in.
+  // Reading the local session lets the application handle that normal state and
+  // redirect the visitor to the login page instead of displaying an error.
+  const { data, error } = await supabase.auth.getSession();
   if (error) throw error;
-  return data.user;
+  return data.session?.user ?? null;
 }
 
 export async function signIn(email, password) {
