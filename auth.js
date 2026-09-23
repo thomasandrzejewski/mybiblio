@@ -1,4 +1,31 @@
-import { supabase, signIn, signUp } from './supabase.js';
-const form = document.querySelector('#auth-form'); const message = document.querySelector('#auth-message'); const redirect = new URLSearchParams(location.search).get('redirect') || 'index.html';
-form.addEventListener('submit', async (event) => { event.preventDefault(); const email = document.querySelector('#email').value; const password = document.querySelector('#password').value; const { error } = await signIn(email, password); if (error) { message.textContent = error.message; return; } location.href = redirect; });
-document.querySelector('#signup').addEventListener('click', async () => { const email = document.querySelector('#email').value; const password = document.querySelector('#password').value; if (!email || password.length < 6) { message.textContent = 'Saisissez un email et un mot de passe d’au moins 6 caractères.'; return; } const { data, error } = await signUp(email, password); message.textContent = error ? error.message : (data.session ? 'Compte créé.' : 'Compte créé. Consultez votre email pour confirmer votre adresse.'); });
+import { signIn } from './supabase.js';
+
+const form = document.querySelector('#auth-form');
+const message = document.querySelector('#auth-message');
+
+if (form) {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const email = document.querySelector('#email').value.trim();
+    const password = document.querySelector('#password').value;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    message.textContent = '';
+    submitButton.disabled = true;
+
+    try {
+      const { error } = await signIn(email, password);
+      if (error) throw error;
+
+      // signInWithPassword has established the Supabase session. Always send
+      // the user to the application home page after a successful login.
+      window.location.replace('index.html');
+    } catch (error) {
+      console.error(error);
+      message.textContent = error.message || 'Impossible de se connecter.';
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
