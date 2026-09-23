@@ -1,5 +1,17 @@
 export const statusLabels = { reading: 'En cours', read: 'Lu', 'to-read': 'À lire' };
+
+const shelfColors = [
+  '#d97706', '#7c3aed', '#0f766e', '#2563eb', '#db2777',
+  '#059669', '#dc2626', '#0891b2', '#9333ea', '#ca8a04'
+];
+
 let user;
+
+function nextShelfColor(existingShelves = []) {
+  const usedColors = new Set(existingShelves.map((shelf) => shelf.color?.toLowerCase()).filter(Boolean));
+  return shelfColors.find((color) => !usedColors.has(color.toLowerCase())) ||
+    `hsl(${(existingShelves.length * 137.508) % 360} 65% 45%)`;
+}
 
 export async function loadLibrary(supabase, currentUser) {
   user = currentUser;
@@ -12,14 +24,29 @@ export async function loadLibrary(supabase, currentUser) {
   return { shelves: shelves || [], books: books || [] };
 }
 
-export async function createShelf(supabase, name) {
-  const { data, error } = await supabase.from('shelves').insert({ user_id: user.id, name, color: '#334155' }).select().single();
+export async function createShelf(supabase, name, existingShelves = []) {
+  const { data, error } = await supabase.from('shelves').insert({
+    user_id: user.id,
+    name,
+    color: nextShelfColor(existingShelves)
+  }).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateShelf(supabase, id, name) {
+  const { data, error } = await supabase.from('shelves')
+    .update({ name })
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select()
+    .single();
   if (error) throw error;
   return data;
 }
 
 export async function deleteShelf(supabase, id) {
-  const { error } = await supabase.from('shelves').delete().eq('id', id);
+  const { error } = await supabase.from('shelves').delete().eq('id', id).eq('user_id', user.id);
   if (error) throw error;
 }
 
