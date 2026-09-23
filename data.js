@@ -1,9 +1,3 @@
-const initialShelves = [
-  { id: 'classiques', name: 'Classiques', color: '#d97706' },
-  { id: 'science-fiction', name: 'Science-fiction', color: '#7c3aed' },
-  { id: 'romans', name: 'Romans', color: '#0f766e' }
-];
-
 export const statusLabels = { reading: 'En cours', read: 'Lu', 'to-read': 'À lire' };
 let user;
 
@@ -15,12 +9,7 @@ export async function loadLibrary(supabase, currentUser) {
   ]);
   if (shelvesError) throw shelvesError;
   if (booksError) throw booksError;
-  if (!shelves.length && !books.length) {
-    const { data, error } = await supabase.from('shelves').insert(initialShelves.map(({ id, ...shelf }) => ({ ...shelf, user_id: user.id }))).select();
-    if (error) throw error;
-    return { shelves: data, books: [] };
-  }
-  return { shelves, books };
+  return { shelves: shelves || [], books: books || [] };
 }
 
 export async function createShelf(supabase, name) {
