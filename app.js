@@ -1,5 +1,5 @@
 import { supabase, currentUser, signOut } from './supabase.js';
-import { loadLibrary, createShelf, updateShelf, deleteShelf, createBook, deleteBook, resetLibrary, uploadBookCover, removeBookCover, statusLabels } from './data.js';
+import { loadLibrary, createShelf, updateShelf, deleteShelf, createBook, updateBook, deleteBook, resetLibrary, uploadBookCover, removeBookCover, statusLabels } from './data.js';
 
 const page = document.body.dataset.page;
 const $ = (selector) => document.querySelector(selector);
@@ -83,9 +83,39 @@ function fillShelves(select) {
 }
 
 function renderAdd() {
-  fillShelves($('#book-shelf'));
+  const form = $('#add-book-form');
+  const titleInput = $('#book-title');
+  const authorInput = $('#book-author');
+  const statusInput = $('#book-status');
+  const shelfInput = $('#book-shelf');
   const coverInput = $('#book-cover');
   const preview = $('#cover-preview');
+  const pageTitle = $('#page-title');
+  const pageSubtitle = $('#page-subtitle');
+  const submitBtn = $('#form-submit-btn');
+
+  fillShelves(shelfInput);
+
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('edit');
+  const editingBook = editId ? library.books.find((book) => String(book.id) === String(editId)) : null;
+
+  if (editingBook) {
+    pageTitle.textContent = 'Modifier le livre';
+    pageSubtitle.textContent = 'Mettez à jour les informations de ce livre.';
+    submitBtn.textContent = 'Enregistrer les modifications';
+
+    titleInput.value = editingBook.title || '';
+    authorInput.value = editingBook.author || '';
+    statusInput.value = editingBook.status || 'to-read';
+    shelfInput.value = editingBook.shelf_id || '';
+
+    if (editingBook.cover_image_url) {
+      preview.src = editingBook.cover_image_url;
+      preview.hidden = false;
+    }
+  }
+
   coverInput?.addEventListener('change', () => {
     const file = coverInput.files[0];
     if (!file) {
@@ -97,29 +127,52 @@ function renderAdd() {
     preview.hidden = false;
   });
 
-  $('#add-book-form').addEventListener('submit', async (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const formElement = event.currentTarget;
-    const form = new FormData(formElement);
-    const title = form.get('title').trim();
+    const formData = new FormData(formElement);
+    const title = formData.get('title')?.trim();
     if (!title) return;
+
     const button = formElement.querySelector('button[type="submit"]');
     button.disabled = true;
+
     let uploaded;
+    let finalCoverUrl = editingBook?.cover_image_url || null;
+
     try {
-      uploaded = await uploadBookCover(supabase, form.get('cover'));
-      const book = await createBook(supabase, {
+      if (coverInput.files[0]) {
+        uploaded = await uploadBookCover(supabase, formData.get('cover'));
+        finalCoverUrl = uploaded?.url || finalCoverUrl;
+      }
+
+      const payload = {
         title,
-        author: form.get('author').trim(),
-        status: form.get('status'),
-        shelf_id: form.get('shelf') || null,
-        cover_image_url: uploaded?.url || null,
-      });
+        author: (formData.get('author') || '').toString().trim(),
+        status: formData.get('status'),
+        shelf_id: formData.get('shelf') || null,
+        cover_image_url: finalCoverUrl,
+      };
+
+      if (editingBook) {
+        const updatedBook = await updateBook(supabase, editingBook.id, payload);
+        const index = library.books.findIndex((book) => String(book.id) === String(editingBook.id));
+        if (index !== -1) {
+          library.books[index] = { ...library.books[index], ...updatedBook };
+        }
+        $('#form-message').textContent = 'Livre mis à jour.';
+        setTimeout(() => {
+          window.location.href = `book-detail.html?book=${encodeURIComponent(editingBook.id)}`;
+        }, 500);
+        return;
+      }
+
+      const book = await createBook(supabase, payload);
       library.books.unshift(book);
       formElement.reset();
       preview.hidden = true;
       preview.removeAttribute('src');
-      fillShelves($('#book-shelf'));
+      fillShelves(shelfInput);
       $('#form-message').textContent = 'Livre ajouté à votre bibliothèque.';
     } catch (error) {
       if (uploaded?.path) await removeBookCover(supabase, uploaded.path);
