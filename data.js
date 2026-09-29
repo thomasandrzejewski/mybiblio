@@ -45,7 +45,7 @@ export async function deleteShelf(supabase, id) {
 }
 
 export async function uploadBookCover(supabase, file) {
-  if (!file) return null;
+  if (!file || !file.size) return null;
   if (!COVER_TYPES.has(file.type)) throw new Error('Format non autorisé. Utilisez une image JPEG, PNG ou WebP.');
   if (file.size > MAX_COVER_SIZE) throw new Error('Image trop volumineuse. La taille maximale est de 5 Mo.');
 
@@ -65,7 +65,7 @@ export async function uploadBookCover(supabase, file) {
 export async function removeBookCover(supabase, path) {
   if (!path) return;
   const { error } = await supabase.storage.from(COVER_BUCKET).remove([path]);
-  if (error) console.warn('Impossible de supprimer l’ancienne couverture', error);
+  if (error) console.warn('Impossible de supprimer l'ancienne couverture', error);
 }
 
 export async function createBook(supabase, book) {
