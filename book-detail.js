@@ -128,11 +128,15 @@ async function init() {
   try {
     const user = await currentUser();
     if (!user) throw new Error('not-authenticated');
-    
+
     library = await loadLibrary(supabase, user);
+
+    if (!library || !Array.isArray(library.books)) {
+      throw new Error('library not loaded');
+    }
+
     renderNav();
 
-    // Récupérer l'ID du livre depuis l'URL
     const params = new URLSearchParams(window.location.search);
     const bookId = params.get('book');
 
@@ -154,8 +158,14 @@ async function init() {
 
     renderBookDetail(book);
   } catch (error) {
-    console.error(error);
-    window.location.replace('auth.html');
+    console.error('Erreur init book-detail :', error);
+    // ne pas rediriger immédiatement si c'est juste un bug local
+    // on peut afficher un message au lieu de se déconnecter
+    const detailSection = $('#book-detail-section');
+    const notFoundSection = $('#book-not-found');
+    if (detailSection) detailSection.style.display = 'none';
+    if (notFoundSection) notFoundSection.style.display = 'block';
+    return;
   }
 }
 
