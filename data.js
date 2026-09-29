@@ -74,6 +74,19 @@ export async function createBook(supabase, book) {
   return data;
 }
 
+export async function updateBook(supabase, id, book) {
+  const { data, error } = await supabase
+    .from('books')
+    .update({ ...book, user_id: user.id })
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteBook(supabase, id) {
   const { error } = await supabase.from('books').delete().eq('id', id);
   if (error) throw error;
