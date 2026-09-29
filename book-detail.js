@@ -35,14 +35,13 @@ function getShelfColor(shelfId) {
 function renderBookDetail(book) {
   currentBook = book;
   const shelf = library.shelves.find((s) => s.id === book.shelf_id);
-  
-  // Afficher les éléments
+
   const detailSection = $('#book-detail-section');
   const notFoundSection = $('#book-not-found');
+
   if (detailSection) detailSection.style.display = 'block';
   if (notFoundSection) notFoundSection.style.display = 'none';
 
-  // Couverture
   const coverDiv = $('#book-detail-cover');
   if (coverDiv) {
     if (book.cover_image_url) {
@@ -52,7 +51,6 @@ function renderBookDetail(book) {
     }
   }
 
-  // Infos
   const titleEl = $('#book-detail-title');
   const authorEl = $('#book-detail-author');
   const statusEl = $('#book-detail-status');
@@ -63,7 +61,6 @@ function renderBookDetail(book) {
   if (statusEl) statusEl.textContent = statusLabels[book.status] || book.status;
   if (shelfEl) shelfEl.textContent = getShelfName(book.shelf_id);
 
-  // Gestionnaires d'événements
   const editBtn = $('#edit-book-btn');
   const deleteBtn = $('#delete-book-btn');
 
