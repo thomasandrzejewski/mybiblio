@@ -65,7 +65,7 @@ export async function uploadBookCover(supabase, file) {
 export async function removeBookCover(supabase, path) {
   if (!path) return;
   const { error } = await supabase.storage.from(COVER_BUCKET).remove([path]);
-  if (error) console.warn('Impossible de supprimer l'ancienne couverture', error);
+  if (error) console.warn('Impossible de supprimer l\'ancienne couverture', error);
 }
 
 export async function createBook(supabase, book) {
