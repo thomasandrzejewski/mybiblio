@@ -15,36 +15,38 @@ function bookCard(book) {
     : escapeHtml(book.title.slice(0, 1).toUpperCase());
 
   return `
-  <article class="book-card" data-book-id="${escapeHtml(book.id)}">
-    <div class="book-cover ${book.cover_image_url ? 'has-image' : ''}" style="--cover:${shelf?.color || '#334155'}">
-      ${cover}
-    </div>
-    <div class="book-info">
-      <h3>${escapeHtml(book.title)}</h3>
-      <p class="muted">${escapeHtml(book.author || '')}</p>
-      <div class="meta">
-        <span class="status">${escapeHtml(statusLabels[book.status] || '')}</span>
-        <small>${escapeHtml(shelf?.name || '')}</small>
+  <a href="book-detail.html?book=${escapeHtml(book.id)}" class="book-card-link">
+    <article class="book-card" data-book-id="${escapeHtml(book.id)}">
+      <div class="book-cover ${book.cover_image_url ? 'has-image' : ''}" style="--cover:${shelf?.color || '#334155'}">
+        ${cover}
       </div>
-    </div>
+      <div class="book-info">
+        <h3>${escapeHtml(book.title)}</h3>
+        <p class="muted">${escapeHtml(book.author || '')}</p>
+        <div class="meta">
+          <span class="status">${escapeHtml(statusLabels[book.status] || '')}</span>
+          <small>${escapeHtml(shelf?.name || '')}</small>
+        </div>
+      </div>
 
-    <div class="book-actions" aria-hidden="false">
-      <button class="action-button edit" type="button" data-edit-book data-book-id="${escapeHtml(book.id)}" aria-label="Modifier ${escapeHtml(book.title)}">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-          <title>Modifier</title>
-          <path d="M3 21v-3.6L16.6 3.8a1 1 0 0 1 1.4 0l1.2 1.2a1 1 0 0 1 0 1.4L5.6 21H3z" fill="currentColor"/>
-          <path d="M20.7 6.3l-1.2-1.2-2.1 2.1 1.2 1.2 2.1-2.1z" fill="currentColor"/>
-        </svg>
-      </button>
+      <div class="book-actions" aria-hidden="false">
+        <button class="action-button edit" type="button" data-edit-book data-book-id="${escapeHtml(book.id)}" aria-label="Modifier ${escapeHtml(book.title)}" onclick="event.preventDefault(); event.stopPropagation();">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <title>Modifier</title>
+            <path d="M3 21v-3.6L16.6 3.8a1 1 0 0 1 1.4 0l1.2 1.2a1 1 0 0 1 0 1.4L5.6 21H3z" fill="currentColor"/>
+            <path d="M20.7 6.3l-1.2-1.2-2.1 2.1 1.2 1.2 2.1-2.1z" fill="currentColor"/>
+          </svg>
+        </button>
 
-      <button class="action-button delete" type="button" data-delete-book data-book-id="${escapeHtml(book.id)}" aria-label="Supprimer ${escapeHtml(book.title)}">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-          <title>Supprimer</title>
-          <path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-      </button>
-    </div>
-  </article>`;
+        <button class="action-button delete" type="button" data-delete-book data-book-id="${escapeHtml(book.id)}" aria-label="Supprimer ${escapeHtml(book.title)}" onclick="event.preventDefault(); event.stopPropagation();">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <title>Supprimer</title>
+            <path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </button>
+      </div>
+    </article>
+  </a>`;
 }
 
 function renderNav() {
@@ -185,7 +187,7 @@ function renderSettings() {
         <span class="shelf-color" style="background:${escapeHtml(shelf.color || '#334155')}"></span>
         <span class="shelf-name">${escapeHtml(shelf.name)}</span>
         <form class="rename-shelf-form" hidden>
-          <label class="sr-only" for="shelf-name-${escapeHtml(shelf.id)}">Nom de l’étagère</label>
+          <label class="sr-only" for="shelf-name-${escapeHtml(shelf.id)}">Nom de l'étagère</label>
           <input id="shelf-name-${escapeHtml(shelf.id)}" name="name" value="${escapeHtml(shelf.name)}" required maxlength="80">
           <button class="secondary-button" type="submit">Enregistrer</button>
           <button class="text-button" type="button" data-cancel-rename>Annuler</button>
@@ -249,4 +251,3 @@ try {
   console.error(error);
   window.location.replace('auth.html');
 }
-
