@@ -5,7 +5,7 @@ const page = document.body.dataset.page;
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 let library;
-const shelfName = (id) => library.shelves.find((shelf) => shelf.id === id)?.name || 'Sans étagère';
+const shelfName = (id) => library?.shelves?.find((shelf) => shelf.id === id)?.name || 'Sans étagère';
 const persistError = (error) => { console.error(error); alert(`Erreur de synchronisation : ${error.message}`); };
 
 function bookCard(book) {
@@ -68,17 +68,20 @@ function renderNav() {
 function renderSearch() {
   const input = $('#search-input');
   const results = $('#search-results');
+  if (!input || !results) return;
   const render = () => {
     const query = input.value.trim().toLowerCase();
     const books = library.books.filter((book) => !query || `${book.title} ${book.author || ''} ${shelfName(book.shelf_id)}`.toLowerCase().includes(query));
     results.innerHTML = books.map((book) => bookCard(book)).join('') || '<p class="muted">Aucun résultat.</p>';
-    document.getElementById('result-count').textContent = books.length ? `${books.length} livre(s)` : '';
+    const count = document.getElementById('result-count');
+    if (count) count.textContent = books.length ? `${books.length} livre(s)` : '';
   };
   input.addEventListener('input', render);
   render();
 }
 
 function fillShelves(select) {
+  if (!select) return;
   select.innerHTML = '<option value="">Choisir une étagère</option>' + library.shelves.map((shelf) => `<option value="${shelf.id}">${escapeHtml(shelf.name)}</option>`).join('');
 }
 
@@ -93,6 +96,12 @@ function renderAdd() {
   const pageTitle = $('#page-title');
   const pageSubtitle = $('#page-subtitle');
   const submitBtn = $('#form-submit-btn');
+  const formMessage = $('#form-message');
+
+  if (!form || !titleInput || !authorInput || !statusInput || !shelfInput || !coverInput || !preview || !pageTitle || !pageSubtitle || !submitBtn || !formMessage) {
+    console.error('Éléments du formulaire d\'ajout absents.');
+    return;
+  }
 
   fillShelves(shelfInput);
 
@@ -116,7 +125,7 @@ function renderAdd() {
     }
   }
 
-  coverInput?.addEventListener('change', () => {
+  coverInput.addEventListener('change', () => {
     const file = coverInput.files[0];
     if (!file) {
       preview.hidden = true;
@@ -129,12 +138,11 @@ function renderAdd() {
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const formElement = event.currentTarget;
-    const formData = new FormData(formElement);
+    const formData = new FormData(form);
     const title = formData.get('title')?.trim();
     if (!title) return;
 
-    const button = formElement.querySelector('button[type="submit"]');
+    const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
 
     let uploaded;
@@ -160,7 +168,7 @@ function renderAdd() {
         if (index !== -1) {
           library.books[index] = { ...library.books[index], ...updatedBook };
         }
-        $('#form-message').textContent = 'Livre mis à jour.';
+        formMessage.textContent = 'Livre mis à jour.';
         setTimeout(() => {
           window.location.href = `book-detail.html?book=${encodeURIComponent(editingBook.id)}`;
         }, 500);
@@ -169,11 +177,11 @@ function renderAdd() {
 
       const book = await createBook(supabase, payload);
       library.books.unshift(book);
-      formElement.reset();
+      form.reset();
       preview.hidden = true;
       preview.removeAttribute('src');
       fillShelves(shelfInput);
-      $('#form-message').textContent = 'Livre ajouté à votre bibliothèque.';
+      formMessage.textContent = 'Livre ajouté à votre bibliothèque.';
     } catch (error) {
       if (uploaded?.path) await removeBookCover(supabase, uploaded.path);
       persistError(error);
@@ -186,6 +194,8 @@ function renderAdd() {
 function renderShelves() {
   const shelfList = $('#shelf-list');
   const booksPanel = $('#shelf-books');
+  if (!shelfList || !booksPanel) return;
+
   const render = (shelfId = 'all') => {
     const books = shelfId === 'all' ? library.books : library.books.filter((book) => book.shelf_id === shelfId);
     $('#shelf-title').textContent = shelfId === 'all' ? 'Tous les livres' : (library.shelves.find((s) => String(s.id) === String(shelfId))?.name || 'Étagère');
@@ -234,6 +244,8 @@ function renderShelves() {
 
 function renderSettings() {
   const list = $('#settings-shelves');
+  if (!list) return;
+
   const render = () => {
     list.innerHTML = library.shelves.map((shelf) => `
       <li class="settings-shelf-row" data-shelf-id="${escapeHtml(shelf.id)}">
