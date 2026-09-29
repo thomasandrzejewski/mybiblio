@@ -13,27 +13,7 @@ function bookCard(book, options = {}) {
   const cover = book.cover_image_url
     ? `<img src="${escapeHtml(book.cover_image_url)}" alt="Couverture de ${escapeHtml(book.title)}" loading="lazy">`
     : escapeHtml(book.title.slice(0, 1).toUpperCase());
-
-  return `
-  <article class="book-card" data-book-id="${escapeHtml(book.id)}">
-    <div class="book-cover ${book.cover_image_url ? 'has-image' : ''}" style="--cover:${shelf?.color || '#334155'}">
-      ${cover}
-    </div>
-    <div class="book-info">
-      <h3>${escapeHtml(book.title)}</h3>
-      <p class="muted">${escapeHtml(book.author || '')}</p>
-      <div class="meta">
-        <span class="status">${escapeHtml(statusLabels[book.status] || '')}</span>
-        <small>${escapeHtml(shelf?.name || '')}</small>
-      </div>
-    </div>
-
-    <!-- Actions : crayon (éditer) à gauche, croix rouge (supprimer) à droite -->
-    <div class="book-actions" aria-hidden="false">
-      <button class="action-button edit" type="button" data-edit-book data-book-id="${escapeHtml(book.id)}" aria-label="Modifier ${escapeHtml(book.title)}">✎</button>
-      <button class="action-button delete" type="button" data-delete-book data-book-id="${escapeHtml(book.id)}" aria-label="Supprimer ${escapeHtml(book.title)}">×</button>
-    </div>
-  </article>`;
+  return `<article class="book-card"><div class="book-cover ${book.cover_image_url ? 'has-image' : ''}" style="--cover:${shelf?.color || '#334155'}">${cover}</div><div class="book-info"><h3>${escapeHtml(book.title)}</h3><p class="muted">${escapeHtml(book.author || '')}</p><div class="meta"><span class="status">${escapeHtml(statusLabels[book.status] || '')}</span><small>${escapeHtml(shelf?.name || '')}</small></div></div></article>`;
 }
 
 function renderNav() {
@@ -70,36 +50,7 @@ function renderShelves() {
   const render = (shelfId = 'all') => { const books = shelfId === 'all' ? library.books : library.books.filter((book) => book.shelf_id === shelfId); $('#shelf-title').textContent = shelfId === 'all' ? 'Tous les livres' : (library.shelves.find((s) => String(s.id) === String(shelfId))?.name || 'Étager'); $('#shelf-subtitle').textContent = shelfId === 'all' ? '' : `${books.length} livre(s)`; booksPanel.innerHTML = books.map((book) => bookCard(book)).join('') || '<p class="muted">Aucun livre sur cette étagère.</p>'; };
   shelfList.innerHTML = `<button class="shelf-item selected" data-shelf="all"><span>Toute la bibliothèque</span><b>${library.books.length}</b></button>` + library.shelves.map((shelf) => `<button class="shelf-item" data-shelf="${shelf.id}"><span>${escapeHtml(shelf.name)}</span><b>${library.books.filter((b) => b.shelf_id === shelf.id).length}</b></button>`).join('');
   shelfList.addEventListener('click', (event) => { const item = event.target.closest('[data-shelf]'); if (item) render(item.dataset.shelf); });
-
-  booksPanel.addEventListener('click', async (event) => {
-    // Édition
-    const editBtn = event.target.closest('[data-edit-book]');
-    if (editBtn) {
-      const bookId = editBtn.dataset.bookId;
-      const book = library.books.find((b) => String(b.id) === String(bookId));
-      if (!book) return;
-      // Rediriger vers add.html en indiquant l'id à éditer (implémentation simple)
-      window.location.href = `add.html?edit=${encodeURIComponent(bookId)}`;
-      return;
-    }
-
-    // Suppression
-    const deleteBtn = event.target.closest('[data-delete-book]');
-    if (deleteBtn) {
-      if (!confirm('Supprimer ce livre ?')) return;
-      try {
-        const bookId = deleteBtn.dataset.bookId;
-        const book = library.books.find((b) => String(b.id) === String(bookId));
-        if (!book) return;
-        await deleteBook(supabase, book.id);
-        library.books = library.books.filter((b) => b.id !== book.id);
-        renderShelves();
-      } catch (error) {
-        persistError(error);
-      }
-      return;
-    }
-  });
+  booksPanel.addEventListener('click', async (event) => { const button = event.target.closest('[data-delete-book]'); if (!button || !confirm('Supprimer ce livre ?')) return; try { const book = library.books.find((b) => String(b.id) === String(button.dataset.bookId)); if (!book) return; await deleteBook(supabase, book.id); library.books = library.books.filter((b) => b.id !== book.id); render(); } catch (error) { persistError(error); } });
   render();
 }
 
