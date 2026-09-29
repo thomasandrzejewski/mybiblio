@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Détail du livre — MyBiblio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="book-detail">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a>
+      <nav aria-label="Navigation principale">
+        <a data-nav="search" href="index.html">Chercher</a>
+        <a data-nav="shelves" href="shelves.html">Étagères</a>
+        <a data-nav="settings" href="settings.html">Paramètres</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <section id="book-detail-section" style="display: none;">
+      <a href="javascript:history.back()" class="text-button" style="margin-bottom: 1.5rem;">← Retour</a>
+      
+      <div class="book-detail-container">
+        <div class="book-detail-cover-section">
+          <div id="book-detail-cover" class="book-detail-cover"></div>
+        </div>
+
+        <div class="book-detail-info">
+          <h1 id="book-detail-title"></h1>
+          <p id="book-detail-author" class="muted" style="font-size: 1.1rem; margin: 0.5rem 0 1.5rem 0;"></p>
+
+          <div class="book-detail-meta">
+            <div class="meta-item">
+              <strong>Statut :</strong>
+              <span id="book-detail-status"></span>
+            </div>
+            <div class="meta-item">
+              <strong>Étagère :</strong>
+              <span id="book-detail-shelf"></span>
+            </div>
+          </div>
+
+          <div class="book-detail-actions">
+            <button id="edit-book-btn" class="primary-button">Modifier</button>
+            <button id="delete-book-btn" class="danger-button">Supprimer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="book-not-found" style="text-align: center; padding: 2rem;">
+      <p class="muted">Livre non trouvé.</p>
+      <a href="index.html" class="text-button">Retour à la bibliothèque</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">MyBiblio · Vos données restent dans votre navigateur.</div>
+  </footer>
+
+  <!-- Modal de confirmation de suppression -->
+  <div id="delete-confirmation-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Confirmer la suppression</h2>
+      <p id="delete-confirmation-message"></p>
+      <div class="modal-actions">
+        <button id="confirm-delete-btn" class="danger-button">Supprimer</button>
+        <button id="cancel-delete-btn" class="secondary-button">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay modal -->
+  <div id="modal-overlay" class="modal-overlay" style="display: none;"></div>
+
+  <script type="module" src="book-detail.js"></script>
+</body>
+</html>
