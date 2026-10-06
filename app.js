@@ -3,7 +3,7 @@ import { loadLibrary, createShelf, updateShelf, deleteShelf, createBook, updateB
 
 const page = document.body.dataset.page;
 const $ = (selector) => document.querySelector(selector);
-const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/ g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 let library;
 const shelfName = (id) => library?.shelves?.find((shelf) => shelf.id === id)?.name || 'Sans étagère';
 const persistError = (error) => { console.error(error); alert(`Erreur de synchronisation : ${error.message}`); };
