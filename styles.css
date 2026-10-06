@@ -38,15 +38,15 @@ button { cursor: pointer; }
 .section-heading h2 { margin: 0; }
 .count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 6px 10px; border-radius: 999px; background: var(--mint); color: var(--green); font-weight: 600; font-size: .85rem; }
 .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-.book-card { display: flex; flex-direction: column; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 18px rgba(15,23,42,.04); }
-.book-cover { width: 100%; aspect-ratio: 2/3; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cover, #334155), rgba(255,255,255,.2)); color: #fff; font-size: 48px; font-weight: 700; text-align: center; padding: 12px; overflow: hidden; }
+.book-card { display: flex; flex-direction: column; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 18px rgba(15,23,42,.04); height: 280px; }
+.book-cover { width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cover, #334155), rgba(255,255,255,.2)); color: #fff; font-size: 48px; font-weight: 700; text-align: center; padding: 12px; overflow: hidden; flex-shrink: 0; }
 .book-cover img { width: 100%; height: 100%; object-fit: cover; }
-.book-info { padding: 14px; }
+.book-info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
 .book-info h3 { margin: 0; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .book-info h3:hover { white-space: normal; }
 .book-info h3[title]:hover { position: relative; z-index: 10; }
-.book-meta, .meta { margin-top: 8px; color: var(--muted); font-size: .85rem; }
-.book-tags, .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.book-meta, .meta { margin-top: 8px; color: var(--muted); font-size: .85rem; flex: 1; }
+.book-tags, .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
 .tag { display: inline-block; padding: 5px 8px; border-radius: 999px; background: var(--mint); color: var(--green); font-size: 11px; font-weight: 700; }
 .muted { color: var(--muted); }
 .shelves-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
