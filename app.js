@@ -3,7 +3,7 @@ import { loadLibrary, createShelf, updateShelf, deleteShelf, createBook, updateB
 
 const page = document.body.dataset.page;
 const $ = (selector) => document.querySelector(selector);
-const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/ g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 let library;
 const shelfName = (id) => library?.shelves?.find((shelf) => shelf.id === id)?.name || 'Sans étagère';
 const persistError = (error) => { console.error(error); alert(`Erreur de synchronisation : ${error.message}`); };
@@ -67,16 +67,27 @@ function renderNav() {
 
 function renderSearch() {
   const input = $('#search-input');
+  const statusFilter = $('#status-filter');
   const results = $('#search-results');
   if (!input || !results) return;
+
   const render = () => {
     const query = input.value.trim().toLowerCase();
-    const books = library.books.filter((book) => !query || `${book.title} ${book.author || ''} ${shelfName(book.shelf_id)}`.toLowerCase().includes(query));
+    const selectedStatus = statusFilter?.value || '';
+
+    const books = library.books.filter((book) => {
+      const matchesQuery = !query || `${book.title} ${book.author || ''} ${shelfName(book.shelf_id)}`.toLowerCase().includes(query);
+      const matchesStatus = !selectedStatus || book.status === selectedStatus;
+      return matchesQuery && matchesStatus;
+    });
+
     results.innerHTML = books.map((book) => bookCard(book)).join('') || '<p class="muted">Aucun résultat.</p>';
     const count = document.getElementById('result-count');
     if (count) count.textContent = books.length ? `${books.length} livre(s)` : '';
   };
+
   input.addEventListener('input', render);
+  statusFilter?.addEventListener('change', render);
   render();
 }
 
