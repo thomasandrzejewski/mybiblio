@@ -1,4 +1,52 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — Mes étagères</title><link rel="stylesheet" href="styles.css"></head>
-<body data-page="shelves"><header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a><nav aria-label="Navigation principale"><a data-nav="search" href="index.html">Rechercher</a><a data-nav="add" href="add.html">Ajouter un livre</a><a data-nav="shelves" href="shelves.html">Mes étagères</a><a data-nav="buy" href="acheter.html">À acheter</a><a data-nav="settings" href="settings.html">Paramètres</a></nav></div></header><main class="container main-content"><section class="page-intro"><p class="eyebrow">ORGANISATION</p><h1>Mes étagères</h1><p>Parcourez votre collection par univers.</p></section><div class="shelves-layout"><aside class="shelf-menu" id="shelf-list"></aside><section><div class="section-heading shelf-heading"><div><h2 id="shelf-title">Tous les livres</h2><p id="shelf-subtitle"></p></div></section><div id="shelf-books" class="book-grid"></div></section></div></main><footer class="site-footer"><div class="container">MyBiblio · Vos données restent dans votre navigateur.</div></footer><script type="module" src="app.js"></script></body></html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MyBiblio — Mes étagères</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="shelves">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">M</span> MyBiblio
+      </a>
+      <nav aria-label="Navigation principale">
+        <a href="index.html" data-nav="search">Rechercher</a>
+        <a href="acheter.html" data-nav="buy">Ajouter un livre</a>
+        <a href="shelves.html" data-nav="shelves">Mes étagères</a>
+        <a href="settings.html" data-nav="settings">Paramètres</a>
+      </nav>
+    </div>
+  </header>
+  <main class="main-content">
+    <div class="container">
+      <div class="page-intro">
+        <h1>Mes étagères</h1>
+        <p>Parcourez votre collection par univers.</p>
+      </div>
+      <div class="shelves-layout">
+        <div class="shelf-menu-section">
+          <div class="shelf-menu" id="shelf-list"></div>
+        </div>
+        <div class="books-section">
+          <div class="section-heading">
+            <div>
+              <h2 id="shelf-title">Tous les livres</h2>
+              <p id="shelf-subtitle"></p>
+            </div>
+          </div>
+          <div id="shelf-books"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 MyBiblio. Tous droits réservés.</p>
+    </div>
+  </footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
