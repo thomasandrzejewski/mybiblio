@@ -1,4 +1,60 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — Paramètres</title><link rel="stylesheet" href="styles.css"></head>
-<body data-page="settings"><header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a><nav aria-label="Navigation principale"><a data-nav="search" href="index.html">Rechercher</a><a data-nav="add" href="add.html">Ajouter un livre</a><a data-nav="shelves" href="shelves.html">Mes étagères</a><a data-nav="buy" href="acheter.html">À acheter</a><a data-nav="settings" href="settings.html">Paramètres</a></nav></div></header><main class="container narrow main-content"><section class="page-intro"><p class="eyebrow">CONFIGURATION</p><h1>Paramètres</h1><p>Personnalisez l’organisation de votre bibliothèque.</p></section><section class="settings-card"><div class="section-heading"><div><h2>Mes étagères</h2><p>Renommez ou supprimez vos étagères. Chaque nouvelle étagère reçoit une couleur différente.</p></div></div><ul id="settings-shelves" class="settings-list"></ul><form id="new-shelf-form" class="inline-form"><input id="new-shelf" required maxlength="80" placeholder="Nom de la nouvelle étagère"><button class="secondary-button" type="submit">Ajouter</button></form><p id="shelf-message" role="status" aria-live="polite"></p></section><section class="settings-card"><h2>Données</h2><p>Cette version fonctionne avec votre compte et la base de données.</p><button id="reset-library" class="text-button danger" type="button">Réinitialiser les données</button></section></main><footer class="site-footer"><div class="container">MyBiblio · Vos données restent dans votre navigateur.</div></footer><script type="module" src="settings.js"></script></body></html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MyBiblio — Paramètres</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="settings">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">M</span> MyBiblio
+      </a>
+      <nav aria-label="Navigation principale">
+        <a href="index.html" data-nav="search">Rechercher</a>
+        <a href="add.html" data-nav="add">Ajouter un livre</a>
+        <a href="shelves.html" data-nav="shelves">Mes étagères</a>
+        <a href="acheter.html" data-nav="buy">À acheter</a>
+        <a href="settings.html" data-nav="settings">Paramètres</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container narrow main-content">
+    <section class="page-intro">
+      <h1>Paramètres</h1>
+      <p>Gérez vos étagères et vos préférences.</p>
+    </section>
+
+    <section aria-labelledby="shelves-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="shelves-title">Mes étagères</h2>
+          <p class="muted">Créez et personnalisez vos étagères pour organiser votre collection.</p>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <form id="shelf-form" class="form-card">
+          <div class="field">
+            <label for="shelf-name">Nom de l'étagère</label>
+            <input id="shelf-name" name="name" type="text" placeholder="Ex. Science-Fiction" required maxlength="60">
+          </div>
+          <div class="field">
+            <label for="shelf-color">Couleur</label>
+            <input id="shelf-color" name="color" type="color" value="#195c4a">
+          </div>
+          <button type="submit" class="button-primary">Ajouter une étagère</button>
+          <p id="shelf-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <ul id="shelf-list" class="settings-list"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
