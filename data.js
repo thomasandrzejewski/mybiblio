@@ -19,7 +19,7 @@ function nextShelfColor(existingShelves = []) {
 export async function loadLibrary(supabase, currentUser) {
   user = currentUser;
   const [{ data: shelves, error: shelvesError }, { data: books, error: booksError }] = await Promise.all([
-    supabase.from('shelves').select('*').order('created_at'),
+    supabase.from('shelves').select('*').order('name'),
     supabase.from('books').select('*').order('created_at', { ascending: false })
   ]);
   if (shelvesError) throw shelvesError;
