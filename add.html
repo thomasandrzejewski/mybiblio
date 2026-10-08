@@ -1,102 +1,383 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MyBiblio — Ajouter un livre</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body data-page="add">
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a>
-      <nav aria-label="Navigation principale">
-        <a data-nav="search" href="index.html">Rechercher</a>
-        <a data-nav="add" href="add.html">Ajouter un livre</a>
-        <a data-nav="shelves" href="shelves.html">Mes étagères</a>
-        <a data-nav="buy" href="acheter.html">À acheter</a>
-        <a data-nav="settings" href="settings.html">Paramètres</a>
-      </nav>
-    </div>
-  </header>
+:root {
+  --ink: #17201d;
+  --muted: #72807a;
+  --line: #e1e8e3;
+  --paper: #f7faf8;
+  --green: #195c4a;
+  --mint: #dff0e8;
+  --orange: #e99a5b;
+  --danger: #b42318;
+}
 
-  <main class="container narrow main-content">
-    <a class="back-link" href="index.html">← Retour à la bibliothèque</a>
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+.container { width: min(1100px, calc(100% - 40px)); margin: auto; }
+.narrow { max-width: 760px; }
+.site-header { background: rgba(247,250,248,.94); border-bottom: 1px solid var(--line); }
+.header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.brand-mark { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: var(--green); color: #fff; font-size: 14px; }
+.header-inner nav { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; }
+.header-inner nav a { color: var(--muted); font-size: 14px; }
+.header-inner nav a.active { color: var(--ink); font-weight: 600; }
+.main-content { padding: 42px 0 64px; }
+.hero { padding: 30px 0 18px; }
+.eyebrow { margin: 0 0 12px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.hero h1, .page-intro h1, .page-intro h2 { margin: 0 0 10px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+.intro, .page-intro p { color: var(--muted); margin: 0; }
+.page-intro { margin-bottom: 28px; }
+.search-box { margin-top: 22px; display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 24px rgba(15,23,42,.05); }
+.search-box span { color: var(--muted); font-size: 1.25rem; }
+.search-box input { flex: 1; border: 0; background: transparent; outline: 0; font-size: 1rem; }
+.filter-row { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
+.filter-row label { font-weight: 600; margin: 0; }
+.filter-row select { padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background: white; }
+.search-footer { margin-top: 12px; display: flex; justify-content: flex-start; align-items: center; gap: 2rem; color: var(--muted); }
+.small-link, .helper-text a, .back-link { color: var(--green); font-weight: 600; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 24px 0 14px; }
+.section-heading h2 { margin: 0; }
+.count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 6px 10px; border-radius: 999px; background: var(--mint); color: var(--green); font-weight: 700; }
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.book-card { position: relative; overflow: hidden; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 18px rgba(15,23,42,.06); transition: transform .2s ease, box-shadow .2s ease; }
+.book-cover { width: 100%; height: 66.666%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cover, #334155), rgba(255,255,255,.2)); color: #fff; font-size: 2rem; font-weight: 700; }
+.book-cover img { width: 100%; height: 100%; object-fit: cover; }
+.book-info { padding: 12px 14px; height: 33.333%; display: flex; flex-direction: column; justify-content: flex-start; }
+.book-info h3 { margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.book-info h3:hover { white-space: normal; overflow: visible; }
+.book-info p.muted { margin: 0; font-size: 0.8rem; color: var(--muted); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.book-info .meta { display: none; }
+.book-meta, .meta { margin-top: 8px; color: var(--muted); font-size: .85rem; flex: 1; }
+.book-tags, .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tag { display: inline-block; padding: 5px 8px; border-radius: 999px; background: var(--mint); color: var(--green); font-size: 11px; font-weight: 700; }
+.muted { color: var(--muted); }
+.shelves-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
+.shelf-menu { display: flex; flex-direction: column; gap: 8px; }
+.shelf-item { display: flex; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--ink); }
+.shelf-item:hover, .shelf-item.selected { background: var(--mint); color: var(--green); }
+#shelf-books { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; width: 100%; }
+.form-card, .settings-card, .purchase-form, .purchase-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 10px 24px rgba(15,23,42,.04); }
+.form-card, .purchase-form { display: grid; gap: 12px; }
+.field { display: grid; gap: 8px; }
+label { font-weight: 600; }
+input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; background: #fff; color: var(--ink); }
+input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--green); box-shadow: 0 0 0 3px rgba(25,92,74,.12); }
+.primary-button, .button-primary { border: 0; border-radius: 999px; padding: 12px 18px; background: var(--green); color: #fff; font-weight: 700; }
+.secondary-button { border: 0; border-radius: 999px; padding: 10px 14px; background: var(--mint); color: var(--green); font-weight: 700; }
+.text-button { border: 1px solid transparent; border-radius: 8px; padding: 6px 8px; background: transparent; color: var(--ink); }
+.text-button.danger, .danger { color: var(--danger); }
+.danger-button { border: 0; border-radius: 999px; padding: 12px 18px; background: var(--danger); color: #fff; font-weight: 700; }
+.form-message, #shelf-message { min-height: 20px; color: var(--muted); margin: 0; }
+.settings-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.settings-shelf-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.shelf-color { width: 12px; height: 12px; flex: 0 0 auto; border-radius: 50%; display: inline-block; }
+.shelf-name { flex: 1; min-width: 0; text-align: left; font-weight: 600; }
+.rename-shelf-form { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.rename-shelf-form input { flex: 1; min-width: 0; }
+.shelf-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+[hidden] { display: none !important; }
+.purchase-page .purchase-form { max-width: 620px; }
+.purchase-table-wrap { overflow: auto; }
+.purchase-table { width: 100%; border-collapse: collapse; }
+.purchase-table th, .purchase-table td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.purchase-table th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.site-footer { padding: 24px 0 28px; color: var(--muted); text-align: center; }
+.book-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.92);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.action-button svg { display: block; width: 18px; height: 18px; }
+.action-button.edit { background: rgba(255,255,255,0.95); color: #0f172a; }
+.action-button.delete { background: #dc2626; color: #fff; }
+.action-button:focus { outline: 3px solid rgba(59,130,246,0.25); outline-offset: 2px; }
 
-    <section class="page-intro">
-      <p class="eyebrow">VOTRE COLLECTION</p>
-      <h1 id="page-title">Ajouter un livre</h1>
-      <p id="page-subtitle">Ajoutez les informations de votre livre et prenez sa couverture en photo avec votre téléphone.</p>
-    </section>
+/* Styles pour la page de détail du livre */
+.book-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
 
-    <!-- SECTION DE SCAN ISBN -->
-    <section id="scan-section" class="scan-section">
-      <div class="scan-header">
-        <h2>Scannez le code-barres</h2>
-        <button type="button" id="toggle-manual" class="text-button">
-          Ou ajouter manuellement →
-        </button>
-      </div>
-      
-      <div class="field">
-        <label for="isbn-input">Code ISBN ou EAN</label>
-        <input 
-          id="isbn-input" 
-          type="text" 
-          placeholder="Ex. 978-2-07-036694-1 ou scannez un code-barres"
-          maxlength="20"
-        >
-        <small>Entrez ou scannez le code-barres du livre</small>
-        <p id="isbn-message" class="form-message" role="status" aria-live="polite"></p>
-      </div>
+.book-card-link:hover {
+  text-decoration: none;
+}
 
-      <button id="search-isbn-btn" class="button-primary" type="button">
-        Rechercher le livre
-      </button>
-    </section>
+.book-card-link:hover .book-card {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15,23,42,0.12);
+}
 
-    <!-- FORMULAIRE PRINCIPAL -->
-    <form id="add-book-form" class="book-form">
-      <div class="field">
-        <label for="book-title">Titre</label>
-        <input id="book-title" name="title" required maxlength="160" placeholder="Ex. Une chambre à soi">
-      </div>
+.book-detail-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+  align-items: start;
+}
 
-      <div class="field">
-        <label for="book-author">Auteur</label>
-        <input id="book-author" name="author" maxlength="120" placeholder="Ex. Virginia Woolf">
-      </div>
+.book-detail-cover-section {
+  position: sticky;
+  top: 20px;
+}
 
-      <div class="field">
-        <label for="book-status">Statut</label>
-        <select id="book-status" name="status">
-          <option value="to-read">À lire</option>
-          <option value="reading">En cours</option>
-          <option value="read">Lu</option>
-        </select>
-      </div>
+.book-detail-cover {
+  width: 280px;
+  height: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 32px rgba(15,23,42,0.15);
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-      <div class="field">
-        <label for="book-shelf">Étagère</label>
-        <select id="book-shelf" name="shelf"></select>
-      </div>
+.book-detail-info {
+  padding: 12px 0;
+}
 
-      <div class="field">
-        <label for="book-cover">Photo de la couverture <span class="muted">(facultatif)</span></label>
-        <input id="book-cover" name="cover" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-        <small>Appuyez ici pour prendre une photo avec l'appareil photo de votre téléphone · JPEG, PNG ou WebP · 5 Mo maximum</small>
-        <img id="cover-preview" alt="Aperçu de la couverture" hidden style="display:block;max-width:140px;max-height:200px;margin-top:12px;border-radius:8px;object-fit:cover">
-      </div>
+.book-detail-info h1 {
+  margin: 0 0 8px 0;
+  font-size: 2rem;
+  line-height: 1.2;
+}
 
-      <button id="form-submit-btn" class="button-primary" type="submit">Ajouter le livre</button>
-      <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
-    </form>
-  </main>
+.book-detail-meta {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0;
+  padding: 16px;
+  background: var(--mint);
+  border-radius: 12px;
+}
 
-  <footer class="site-footer">
-    <div class="container">MyBiblio · Vos données restent dans votre navigateur.</div>
-  </footer>
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-  <script type="module" src="app.js"></script>
-</body>
-</html>
+.meta-item strong {
+  font-weight: 600;
+  color: var(--green);
+}
+
+.book-detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.book-detail-actions button {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-detail-actions .primary-button {
+  background: #f0f0f0;
+  color: var(--ink);
+  border: 2px solid var(--line);
+}
+
+.book-detail-actions .primary-button:hover {
+  background: #e8e8e8;
+  border-color: #ccc;
+}
+
+.book-detail-actions .danger-button {
+  background: var(--danger);
+  color: #fff;
+}
+
+.book-detail-actions .danger-button:hover {
+  background: #a91e1e;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(0,0,0,0.2);
+  max-width: 400px;
+  width: 90%;
+}
+
+.modal-content {
+  padding: 28px;
+}
+
+.modal-content h2 {
+  margin: 0 0 12px 0;
+  font-size: 1.4rem;
+}
+
+.modal-content p {
+  margin: 0 0 24px 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-actions .danger-button {
+  background: var(--danger);
+  color: white;
+}
+
+.modal-actions .secondary-button {
+  background: var(--mint);
+  color: var(--green);
+}
+
+/* Styles pour la section de scan ISBN */
+.scan-section {
+  background: #fff;
+  border: 2px solid var(--green);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.scan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.scan-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.scan-section .field {
+  margin-bottom: 16px;
+}
+
+.scan-section .field small {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+#search-isbn-btn {
+  width: 100%;
+  padding: 12px 18px;
+}
+
+.book-form.hidden {
+  display: none;
+}
+
+.scan-section.hidden {
+  display: none;
+}
+
+#isbn-message {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+#isbn-message.success {
+  color: var(--green);
+}
+
+#isbn-message.error {
+  color: var(--danger);
+}
+
+@media (max-width: 700px) {
+  .container { width: min(100% - 28px, 1100px); }
+  .header-inner { min-height: 65px; align-items: flex-start; padding: 12px 0; flex-direction: column; }
+  .header-inner nav { gap: 0; }
+  .header-inner nav a { padding: 8px 6px; font-size: 12px; }
+  .main-content { padding-top: 28px; }
+  .shelves-layout { grid-template-columns: 1fr; }
+  .shelf-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .inline-form { flex-direction: column; }
+  #shelf-books { max-width: 100%; }
+
+  .book-detail-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .book-detail-cover-section {
+    position: static;
+  }
+
+  .book-detail-cover {
+    width: 100%;
+    height: 300px;
+  }
+
+  .book-detail-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .book-detail-actions {
+    flex-direction: column;
+  }
+
+  .scan-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .scan-header h2 {
+    font-size: 1.1rem;
+  }
+}
