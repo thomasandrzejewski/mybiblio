@@ -1,5 +1,6 @@
 import { supabase, currentUser, signOut } from './supabase.js';
 import { loadLibrary, createShelf, updateShelf, deleteShelf, createBook, updateBook, deleteBook, resetLibrary, uploadBookCover, removeBookCover, statusLabels } from './data.js';
+import { searchBookByISBN, isValidISBN } from './isbn.js';
 
 const page = document.body.dataset.page;
 const $ = (selector) => document.querySelector(selector);
@@ -30,7 +31,7 @@ function bookCard(book) {
       </div>
 
       <div class="book-actions" aria-hidden="false">
-        <button class="action-button edit" type="button" data-edit-book data-book-id="${escapeHtml(book.id)}" aria-label="Modifier ${escapeHtml(book.title)}" onclick="event.preventDefault(); event.stopPropagation();">
+        <button class="action-button edit" type="button" data-edit-book data-book-id="${escapeHtml(book.id)}" aria-label="Modifier ${escapeHtml(book.title)}" onclick="event.preventDefault(); event[...]
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
             <title>Modifier</title>
             <path d="M3 21v-3.6L16.6 3.8a1 1 0 0 1 1.4 0l1.2 1.2a1 1 0 0 1 0 1.4L5.6 21H3z" fill="currentColor"/>
@@ -38,7 +39,7 @@ function bookCard(book) {
           </svg>
         </button>
 
-        <button class="action-button delete" type="button" data-delete-book data-book-id="${escapeHtml(book.id)}" aria-label="Supprimer ${escapeHtml(book.title)}" onclick="event.preventDefault(); event.stopPropagation();">
+        <button class="action-button delete" type="button" data-delete-book data-book-id="${escapeHtml(book.id)}" aria-label="Supprimer ${escapeHtml(book.title)}" onclick="event.preventDefault(); [...]
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
             <title>Supprimer</title>
             <path d="M6 6 L18 18 M6 18 L18 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -109,6 +110,13 @@ function renderAdd() {
   const submitBtn = $('#form-submit-btn');
   const formMessage = $('#form-message');
 
+  // NOUVEAUX ÉLÉMENTS DE SCAN
+  const scanSection = $('#scan-section');
+  const isbnInput = $('#isbn-input');
+  const searchBtn = $('#search-isbn-btn');
+  const isbnMessage = $('#isbn-message');
+  const toggleManualBtn = $('#toggle-manual');
+
   if (!form || !titleInput || !authorInput || !statusInput || !shelfInput || !coverInput || !preview || !pageTitle || !pageSubtitle || !submitBtn || !formMessage) {
     console.error('Éléments du formulaire d\'ajout absents.');
     return;
@@ -134,8 +142,85 @@ function renderAdd() {
       preview.src = editingBook.cover_image_url;
       preview.hidden = false;
     }
+
+    // Masquer la section de scan en mode édition
+    scanSection.classList.add('hidden');
   }
 
+  // GESTION DU BOUTON "AJOUTER MANUELLEMENT"
+  if (toggleManualBtn) {
+    toggleManualBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      scanSection.classList.add('hidden');
+      isbnInput.value = '';
+      isbnMessage.textContent = '';
+      isbnMessage.className = 'form-message';
+      // Focus sur le champ titre
+      setTimeout(() => titleInput.focus(), 100);
+    });
+  }
+
+  // GESTION DE LA RECHERCHE ISBN
+  if (searchBtn && isbnInput) {
+    searchBtn.addEventListener('click', async () => {
+      const isbn = isbnInput.value.trim();
+
+      if (!isbn) {
+        isbnMessage.textContent = 'Veuillez entrer un ISBN.';
+        isbnMessage.className = 'form-message error';
+        return;
+      }
+
+      if (!isValidISBN(isbn)) {
+        isbnMessage.textContent = 'ISBN invalide. Format attendu : 10 ou 13 chiffres.';
+        isbnMessage.className = 'form-message error';
+        return;
+      }
+
+      searchBtn.disabled = true;
+      isbnMessage.textContent = 'Recherche en cours...';
+      isbnMessage.className = 'form-message';
+
+      try {
+        const bookData = await searchBookByISBN(isbn);
+
+        // Pré-remplir le formulaire
+        titleInput.value = bookData.title;
+        authorInput.value = bookData.author;
+
+        // Si une couverture est disponible, la prévisualiser
+        if (bookData.coverUrl) {
+          preview.src = bookData.coverUrl;
+          preview.hidden = false;
+        }
+
+        isbnMessage.textContent = `✓ Livre trouvé : "${bookData.title}". Vous pouvez modifier les informations ci-dessous.`;
+        isbnMessage.className = 'form-message success';
+
+        // Masquer la section de scan et montrer le formulaire
+        scanSection.classList.add('hidden');
+        
+        // Focus sur le formulaire pour que l'utilisateur continue
+        setTimeout(() => statusInput.focus(), 300);
+
+      } catch (error) {
+        isbnMessage.textContent = `❌ ${error.message}`;
+        isbnMessage.className = 'form-message error';
+      } finally {
+        searchBtn.disabled = false;
+      }
+    });
+
+    // PERMETTRE LA RECHERCHE EN APPUYANT SUR ENTRÉE
+    isbnInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        searchBtn.click();
+      }
+    });
+  }
+
+  // Gestion du changement de couverture
   coverInput.addEventListener('change', () => {
     const file = coverInput.files[0];
     if (!file) {
@@ -147,6 +232,7 @@ function renderAdd() {
     preview.hidden = false;
   });
 
+  // Gestion de la soumission du formulaire
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -193,6 +279,12 @@ function renderAdd() {
       preview.removeAttribute('src');
       fillShelves(shelfInput);
       formMessage.textContent = 'Livre ajouté à votre bibliothèque.';
+      
+      // Réinitialiser l'affichage de la section scan
+      scanSection.classList.remove('hidden');
+      isbnInput.value = '';
+      isbnMessage.textContent = '';
+      
     } catch (error) {
       if (uploaded?.path) await removeBookCover(supabase, uploaded.path);
       persistError(error);
@@ -216,7 +308,7 @@ function renderShelves() {
 
   shelfList.innerHTML =
     `<button class="shelf-item selected" data-shelf="all"><span>Toute la bibliothèque</span><b>${library.books.length}</b></button>` +
-    library.shelves.map((shelf) => `<button class="shelf-item" data-shelf="${shelf.id}"><span>${escapeHtml(shelf.name)}</span><b>${library.books.filter((b) => b.shelf_id === shelf.id).length}</b></button>`).join('');
+    library.shelves.map((shelf) => `<button class="shelf-item" data-shelf="${shelf.id}"><span>${escapeHtml(shelf.name)}</span><b>${library.books.filter((b) => b.shelf_id === shelf.id).length}</b>[...]
 
   shelfList.addEventListener('click', (event) => {
     const item = event.target.closest('[data-shelf]');

@@ -29,7 +29,7 @@ button { cursor: pointer; }
 .hero h1, .page-intro h1, .page-intro h2 { margin: 0 0 10px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
 .intro, .page-intro p { color: var(--muted); margin: 0; }
 .page-intro { margin-bottom: 28px; }
-.search-box { margin-top: 22px; display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 24px rgb(15,23,42,0.04); }
+.search-box { margin-top: 22px; display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 24px rgb[...]
 .search-box span { color: var(--muted); font-size: 1.25rem; }
 .search-box input { flex: 1; border: 0; background: transparent; outline: 0; font-size: 1rem; }
 .filter-row { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
@@ -39,10 +39,10 @@ button { cursor: pointer; }
 .small-link, .helper-text a, .back-link { color: var(--green); font-weight: 600; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 24px 0 14px; }
 .section-heading h2 { margin: 0; }
-.count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 6px 10px; border-radius: 999px; background: var(--mint); color: var(--green); font-weight: 700; font-size: .8rem; }
+.count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 6px 10px; border-radius: 999px; background: var(--mint); color: var(--green); font-weigh[...]
 .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-.book-card { position: relative; overflow: hidden; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 18px rgba(15,23,42,0.06); text-decoration: none; color: inherit; }
-.book-cover { width: 100%; height: 66.666%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cover, #334155), rgba(255,255,255,.2)); color: #f7faf8; }
+.book-card { position: relative; overflow: hidden; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 18px rgba(15,23,42[...]
+.book-cover { width: 100%; height: 66.666%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cover, #334155), rgba(255,255,255,.2)); color: #f[...]
 .book-cover img { width: 100%; height: 100%; object-fit: cover; }
 .book-info { padding: 12px 14px; height: 33.333%; display: flex; flex-direction: column; justify-content: flex-start; }
 .book-info h3 { margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 700; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -55,10 +55,10 @@ button { cursor: pointer; }
 .muted { color: var(--muted); }
 .shelves-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
 .shelf-menu { display: flex; flex-direction: column; gap: 8px; }
-.shelf-item { display: flex; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--ink); }
+.shelf-item { display: flex; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--i[...]
 .shelf-item:hover, .shelf-item.selected { background: var(--mint); color: var(--green); }
 #shelf-books { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; width: 100%; }
-.form-card, .settings-card, .purchase-form, .purchase-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 10px 24px rgba(15,23,42,0.04); }
+.form-card, .settings-card, .purchase-form, .purchase-table-wrap { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 10px 24px rgba(15,23,42,0.04);[...]
 .form-card, .purchase-form { display: grid; gap: 12px; }
 .field { display: grid; gap: 8px; }
 label { font-weight: 600; }
@@ -282,6 +282,66 @@ input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--gree
   color: var(--green);
 }
 
+/* Styles pour la section de scan ISBN */
+.scan-section {
+  background: #fff;
+  border: 2px solid var(--green);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.scan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.scan-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.scan-section .field {
+  margin-bottom: 16px;
+}
+
+.scan-section .field small {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+#search-isbn-btn {
+  width: 100%;
+  padding: 12px 18px;
+}
+
+/* État caché du formulaire */
+.book-form.hidden {
+  display: none;
+}
+
+.scan-section.hidden {
+  display: none;
+}
+
+/* Message d'état de recherche */
+#isbn-message {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+#isbn-message.success {
+  color: var(--green);
+}
+
+#isbn-message.error {
+  color: var(--danger);
+}
+
 @media (max-width: 700px) {
   .container { width: min(100% - 28px, 1100px); }
   .header-inner { min-height: 65px; align-items: flex-start; padding: 12px 0; flex-direction: column; }
@@ -313,5 +373,14 @@ input:focus, select:focus, textarea:focus { outline: 0; border-color: var(--gree
 
   .book-detail-actions {
     flex-direction: column;
+  }
+
+  .scan-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .scan-header h2 {
+    font-size: 1.1rem;
   }
 }

@@ -29,6 +29,33 @@
       <p id="page-subtitle">Ajoutez les informations de votre livre et prenez sa couverture en photo avec votre téléphone.</p>
     </section>
 
+    <!-- SECTION DE SCAN ISBN -->
+    <section id="scan-section" class="scan-section">
+      <div class="scan-header">
+        <h2>Scannez le code-barres</h2>
+        <button type="button" id="toggle-manual" class="text-button">
+          Ou ajouter manuellement →
+        </button>
+      </div>
+      
+      <div class="field">
+        <label for="isbn-input">Code ISBN ou EAN</label>
+        <input 
+          id="isbn-input" 
+          type="text" 
+          placeholder="Ex. 978-2-07-036694-1 ou scannez un code-barres"
+          maxlength="20"
+        >
+        <small>Entrez ou scannez le code-barres du livre</small>
+        <p id="isbn-message" class="form-message" role="status" aria-live="polite"></p>
+      </div>
+
+      <button id="search-isbn-btn" class="button-primary" type="button">
+        Rechercher le livre
+      </button>
+    </section>
+
+    <!-- FORMULAIRE PRINCIPAL -->
     <form id="add-book-form" class="book-form">
       <div class="field">
         <label for="book-title">Titre</label>
