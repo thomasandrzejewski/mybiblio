@@ -1,8 +1,64 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyBiblio — Ma bibliothèque</title><link rel="stylesheet" href="styles.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MyBiblio — Ma bibliothèque</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
 <body data-page="search">
-  <header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a><nav aria-label="Navigation principale"><a data-nav="search" href="index.html">Recherche</a><a data-nav="shelves" href="shelves.html">Étagères</a><a data-nav="add" href="add.html">Ajouter</a><a data-nav="settings" href="settings.html">Paramètres</a></nav></div></header>
-  <main class="container main-content"><section class="hero"><p class="eyebrow">VOTRE BIBLIOTHÈQUE, EN UN COUP D'ŒIL</p><h1>Retrouvez votre<br><em>prochaine lecture.</em></h1><p class="intro">Trouvez rapidement le livre que vous cherchez.</p></section><section class="search-box"><span>🔍</span><input id="search-input" type="text" placeholder="Rechercher par titre, auteur, étagère…"></section><section class="filter-row"><label for="status-filter">Filtrer par statut</label><select id="status-filter"><option value="">Tous les statuts</option><option value="to-read">À lire</option><option value="reading">En cours</option><option value="read">Lu</option></select></section><section class="search-footer"><p id="result-count"></p></section><section id="search-results" class="book-grid"></section></main>
-  <footer class="site-footer"><div class="container">MyBiblio · Vos données restent dans votre navigateur.</div></footer><script type="module" src="app.js"></script>
-</body></html>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">M</span> MyBiblio
+      </a>
+      <nav aria-label="Navigation principale">
+        <a href="index.html" data-nav="search">Rechercher</a>
+        <a href="add.html" data-nav="add">Ajouter un livre</a>
+        <a href="shelves.html" data-nav="shelves">Mes étagères</a>
+        <a href="acheter.html" data-nav="buy">À acheter</a>
+        <a href="settings.html" data-nav="settings">Paramètres</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <section class="hero">
+      <p class="eyebrow">VOTRE BIBLIOTHÈQUE, EN UN COUP D'ŒIL</p>
+      <h1>Retrouvez votre<br><em>prochaine lecture.</em></h1>
+      <p class="intro">Trouvez rapidement le livre parfait dans votre collection.</p>
+      <div class="search-box">
+        <span>🔍</span>
+        <input id="search-input" type="text" placeholder="Chercher un titre, un auteur...">
+      </div>
+      <div class="search-footer">
+        <span id="search-count"></span>
+        <div class="filter-row">
+          <label for="status-filter">Statut :</label>
+          <select id="status-filter">
+            <option value="">Tous les statuts</option>
+            <option value="to-read">À lire</option>
+            <option value="reading">En cours</option>
+            <option value="read">Lu</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="books-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="books-title">Votre collection</h2>
+        </div>
+      </div>
+      <div id="books-container" class="book-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">MyBiblio · Vos données restent dans votre navigateur.</div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
