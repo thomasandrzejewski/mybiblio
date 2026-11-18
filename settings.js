@@ -5,6 +5,8 @@ const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 const list = $('#settings-shelves');
 const message = $('#shelf-message');
+const deleteSelect = $('#shelf-to-delete');
+const deleteButton = $('#delete-shelf-button');
 let library;
 
 function setMessage(text, isError = false) {
@@ -41,10 +43,17 @@ function renderShelves() {
         </form>
         <span class="shelf-actions">
           <button class="text-button" type="button" data-edit-shelf aria-label="Modifier ${escapeHtml(shelf.name)}" title="Modifier">✎</button>
-          <button class="text-button danger" type="button" data-delete-shelf>Supprimer</button>
         </span>
       </li>`).join('')
     : '<li class="muted">Aucune étagère pour le moment.</li>';
+
+  const selectedShelfId = deleteSelect.value;
+  deleteSelect.innerHTML = '<option value="">Choisir une étagère</option>' +
+    library.shelves.map((shelf) => `<option value="${escapeHtml(shelf.id)}">${escapeHtml(shelf.name)}</option>`).join('');
+  if (library.shelves.some((shelf) => String(shelf.id) === selectedShelfId)) {
+    deleteSelect.value = selectedShelfId;
+  }
+  deleteButton.disabled = library.shelves.length === 0 || !deleteSelect.value;
 
   list.querySelectorAll('[data-edit-shelf]').forEach((button) => button.addEventListener('click', (event) => {
     const row = event.currentTarget.closest('[data-shelf-id]');
@@ -81,21 +90,6 @@ function renderShelves() {
       setMessage(error.message || 'Impossible de renommer cette étagère.', true);
     }
   }));
-
-  list.querySelectorAll('[data-delete-shelf]').forEach((button) => button.addEventListener('click', async (event) => {
-    const row = event.currentTarget.closest('[data-shelf-id]');
-    const shelf = library.shelves.find((item) => String(item.id) === row.dataset.shelfId);
-    if (!shelf || !confirm(`Supprimer l’étagère « ${shelf.name} » ?`)) return;
-    try {
-      await deleteShelf(supabase, shelf.id);
-      library.shelves = library.shelves.filter((item) => String(item.id) !== String(shelf.id));
-      renderShelves();
-      setMessage('Étagère supprimée.');
-    } catch (error) {
-      console.error(error);
-      setMessage(error.message || 'Impossible de supprimer cette étagère.', true);
-    }
-  }));
 }
 
 $('#new-shelf-form').addEventListener('submit', async (event) => {
@@ -116,6 +110,32 @@ $('#new-shelf-form').addEventListener('submit', async (event) => {
     setMessage(error.message || 'Impossible de créer cette étagère.', true);
   } finally {
     submitButton.disabled = false;
+  }
+});
+
+deleteSelect.addEventListener('change', () => {
+  deleteButton.disabled = !deleteSelect.value;
+});
+
+$('#delete-shelf-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const shelf = library.shelves.find((item) => String(item.id) === deleteSelect.value);
+  if (!shelf) {
+    setMessage('Choisissez une étagère à supprimer.', true);
+    return;
+  }
+  if (!confirm(`Supprimer l’étagère « ${shelf.name} » ?`)) return;
+
+  deleteButton.disabled = true;
+  try {
+    await deleteShelf(supabase, shelf.id);
+    library.shelves = library.shelves.filter((item) => String(item.id) !== String(shelf.id));
+    renderShelves();
+    setMessage('Étagère supprimée.');
+  } catch (error) {
+    console.error(error);
+    setMessage(error.message || 'Impossible de supprimer cette étagère.', true);
+    deleteButton.disabled = !deleteSelect.value;
   }
 });
 

@@ -52,6 +52,18 @@
       </div>
 
       <ul id="settings-shelves" class="settings-list"></ul>
+
+      <div class="settings-card" style="margin-top: 24px">
+        <form id="delete-shelf-form" class="form-card">
+          <div class="field">
+            <label for="shelf-to-delete">Étagère à supprimer</label>
+            <select id="shelf-to-delete" name="shelf" required>
+              <option value="">Choisir une étagère</option>
+            </select>
+          </div>
+          <button id="delete-shelf-button" class="danger-button" type="submit" disabled>Supprimer l’étagère sélectionnée</button>
+        </form>
+      </div>
     </section>
   </main>
 
