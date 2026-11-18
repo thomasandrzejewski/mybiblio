@@ -1,5 +1,5 @@
 import { supabase, currentUser, signOut } from './supabase.js';
-import { loadLibrary, createShelf, updateShelf, deleteShelf, resetLibrary } from './data.js';
+import { loadLibrary, createShelf, updateShelf, deleteShelf } from './data.js';
 
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
@@ -88,7 +88,7 @@ function renderShelves() {
     if (!shelf || !confirm(`Supprimer l’étagère « ${shelf.name} » ?`)) return;
     try {
       await deleteShelf(supabase, shelf.id);
-      library.shelves = library.shelves.filter((item) => item.id !== shelf.id);
+      library.shelves = library.shelves.filter((item) => String(item.id) !== String(shelf.id));
       renderShelves();
       setMessage('Étagère supprimée.');
     } catch (error) {
@@ -103,8 +103,10 @@ $('#new-shelf-form').addEventListener('submit', async (event) => {
   const input = $('#new-shelf');
   const name = input.value.trim();
   if (!name) return;
+  const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
   try {
-    const shelf = await createShelf(supabase, name, library.shelves);
+    const shelf = await createShelf(supabase, name, library.shelves, $('#shelf-color').value);
     library.shelves.push(shelf);
     input.value = '';
     renderShelves();
@@ -112,18 +114,8 @@ $('#new-shelf-form').addEventListener('submit', async (event) => {
   } catch (error) {
     console.error(error);
     setMessage(error.message || 'Impossible de créer cette étagère.', true);
-  }
-});
-
-$('#reset-library').addEventListener('click', async () => {
-  if (!confirm('Supprimer tous les livres et toutes les étagères ?')) return;
-  try {
-    library = await resetLibrary(supabase);
-    renderShelves();
-    setMessage('Données réinitialisées.');
-  } catch (error) {
-    console.error(error);
-    setMessage(error.message || 'Impossible de réinitialiser les données.', true);
+  } finally {
+    submitButton.disabled = false;
   }
 });
 

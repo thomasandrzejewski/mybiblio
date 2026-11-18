@@ -27,8 +27,12 @@ export async function loadLibrary(supabase, currentUser) {
   return { shelves: shelves || [], books: books || [] };
 }
 
-export async function createShelf(supabase, name, existingShelves = []) {
-  const { data, error } = await supabase.from('shelves').insert({ user_id: user.id, name, color: nextShelfColor(existingShelves) }).select().single();
+export async function createShelf(supabase, name, existingShelves = [], color) {
+  const { data, error } = await supabase.from('shelves').insert({
+    user_id: user.id,
+    name,
+    color: color || nextShelfColor(existingShelves)
+  }).select().single();
   if (error) throw error;
   return data;
 }
