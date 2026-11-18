@@ -3,7 +3,6 @@ import { loadLibrary, createShelf, updateShelf, deleteShelf } from './data.js';
 
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
-const list = $('#settings-shelves');
 const message = $('#shelf-message');
 const shelfSelect = $('#shelf-to-manage');
 const editButton = $('#edit-shelf-button');
@@ -34,14 +33,6 @@ function renderNav() {
 
 function renderShelves() {
   const selectedShelfId = shelfSelect.value;
-  list.innerHTML = library.shelves.length
-    ? library.shelves.map((shelf) => `
-      <li class="settings-shelf-row">
-        <span class="shelf-color" style="background:${escapeHtml(shelf.color || '#334155')}" aria-hidden="true"></span>
-        <span class="shelf-name">${escapeHtml(shelf.name)}</span>
-      </li>`).join('')
-    : '<li class="muted">Aucune étagère pour le moment.</li>';
-
   shelfSelect.innerHTML = '<option value="">Choisir une étagère</option>' +
     library.shelves.map((shelf) => `<option value="${escapeHtml(shelf.id)}">${escapeHtml(shelf.name)}</option>`).join('');
   if (library.shelves.some((shelf) => String(shelf.id) === selectedShelfId)) {
@@ -55,8 +46,6 @@ function selectedShelf() {
   return library.shelves.find((shelf) => String(shelf.id) === shelfSelect.value);
 }
 
-renderNav;
-
 $('#new-shelf-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const input = $('#new-shelf');
@@ -65,7 +54,7 @@ $('#new-shelf-form').addEventListener('submit', async (event) => {
   const submitButton = event.currentTarget.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   try {
-    const shelf = await createShelf(supabase, name, library.shelves, $('#shelf-color').value);
+    const shelf = await createShelf(supabase, name, library.shelves);
     library.shelves.push(shelf);
     input.value = '';
     renderShelves();

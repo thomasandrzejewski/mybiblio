@@ -11,9 +11,19 @@ const COVER_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 let user;
 
 function nextShelfColor(existingShelves = []) {
-  const usedColors = new Set(existingShelves.map((shelf) => shelf.color?.toLowerCase()).filter(Boolean));
-  return shelfColors.find((color) => !usedColors.has(color.toLowerCase())) ||
-    `hsl(${(existingShelves.length * 137.508) % 360} 65% 45%)`;
+  const existingColors = new Set(existingShelves.map((shelf) => shelf.color?.toLowerCase()).filter(Boolean));
+  const availableColors = shelfColors.filter((color) => !existingColors.has(color.toLowerCase()));
+
+  if (availableColors.length) {
+    return availableColors[Math.floor(Math.random() * availableColors.length)];
+  }
+
+  let color;
+  do {
+    const hue = Math.floor(Math.random() * 360);
+    color = `hsl(${hue} 65% 45%)`;
+  } while (existingColors.has(color.toLowerCase()));
+  return color;
 }
 
 export async function loadLibrary(supabase, currentUser) {
@@ -27,11 +37,11 @@ export async function loadLibrary(supabase, currentUser) {
   return { shelves: shelves || [], books: books || [] };
 }
 
-export async function createShelf(supabase, name, existingShelves = [], color) {
+export async function createShelf(supabase, name, existingShelves = []) {
   const { data, error } = await supabase.from('shelves').insert({
     user_id: user.id,
     name,
-    color: color || nextShelfColor(existingShelves)
+    color: nextShelfColor(existingShelves)
   }).select().single();
   if (error) throw error;
   return data;
