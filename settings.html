@@ -51,19 +51,32 @@
         </form>
       </div>
 
-      <ul id="settings-shelves" class="settings-list"></ul>
-
       <div class="settings-card" style="margin-top: 24px">
-        <form id="delete-shelf-form" class="form-card">
+        <div class="form-card">
           <div class="field">
-            <label for="shelf-to-delete">Étagère à supprimer</label>
-            <select id="shelf-to-delete" name="shelf" required>
+            <label for="shelf-to-manage">Étagère à modifier ou supprimer</label>
+            <select id="shelf-to-manage" name="shelf" required>
               <option value="">Choisir une étagère</option>
             </select>
           </div>
-          <button id="delete-shelf-button" class="danger-button" type="submit" disabled>Supprimer l’étagère sélectionnée</button>
-        </form>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <button id="edit-shelf-button" class="secondary-button" type="button" disabled>Modifier</button>
+            <button id="delete-shelf-button" class="danger-button" type="button" disabled>Supprimer</button>
+          </div>
+          <form id="rename-shelf-form" class="form-card" hidden>
+            <div class="field">
+              <label for="rename-shelf-name">Nouveau nom de l’étagère</label>
+              <input id="rename-shelf-name" name="name" required maxlength="80">
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px">
+              <button class="button-primary" type="submit">Enregistrer</button>
+              <button id="cancel-rename-shelf" class="text-button" type="button">Annuler</button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      <ul id="settings-shelves" class="settings-list"></ul>
     </section>
   </main>
 

@@ -5,8 +5,11 @@ const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 const list = $('#settings-shelves');
 const message = $('#shelf-message');
-const deleteSelect = $('#shelf-to-delete');
+const shelfSelect = $('#shelf-to-manage');
+const editButton = $('#edit-shelf-button');
 const deleteButton = $('#delete-shelf-button');
+const renameForm = $('#rename-shelf-form');
+const renameInput = $('#rename-shelf-name');
 let library;
 
 function setMessage(text, isError = false) {
@@ -30,67 +33,29 @@ function renderNav() {
 }
 
 function renderShelves() {
+  const selectedShelfId = shelfSelect.value;
   list.innerHTML = library.shelves.length
     ? library.shelves.map((shelf) => `
-      <li class="settings-shelf-row" data-shelf-id="${escapeHtml(shelf.id)}">
+      <li class="settings-shelf-row">
         <span class="shelf-color" style="background:${escapeHtml(shelf.color || '#334155')}" aria-hidden="true"></span>
         <span class="shelf-name">${escapeHtml(shelf.name)}</span>
-        <form class="rename-shelf-form" hidden>
-          <label class="sr-only" for="shelf-name-${escapeHtml(shelf.id)}">Nom de l’étagère</label>
-          <input id="shelf-name-${escapeHtml(shelf.id)}" name="name" value="${escapeHtml(shelf.name)}" required maxlength="80">
-          <button class="secondary-button" type="submit">Enregistrer</button>
-          <button class="text-button" type="button" data-cancel-rename>Annuler</button>
-        </form>
-        <span class="shelf-actions">
-          <button class="text-button" type="button" data-edit-shelf aria-label="Modifier ${escapeHtml(shelf.name)}" title="Modifier">✎</button>
-        </span>
       </li>`).join('')
     : '<li class="muted">Aucune étagère pour le moment.</li>';
 
-  const selectedShelfId = deleteSelect.value;
-  deleteSelect.innerHTML = '<option value="">Choisir une étagère</option>' +
+  shelfSelect.innerHTML = '<option value="">Choisir une étagère</option>' +
     library.shelves.map((shelf) => `<option value="${escapeHtml(shelf.id)}">${escapeHtml(shelf.name)}</option>`).join('');
   if (library.shelves.some((shelf) => String(shelf.id) === selectedShelfId)) {
-    deleteSelect.value = selectedShelfId;
+    shelfSelect.value = selectedShelfId;
   }
-  deleteButton.disabled = library.shelves.length === 0 || !deleteSelect.value;
-
-  list.querySelectorAll('[data-edit-shelf]').forEach((button) => button.addEventListener('click', (event) => {
-    const row = event.currentTarget.closest('[data-shelf-id]');
-    const name = row.querySelector('.shelf-name');
-    const form = row.querySelector('.rename-shelf-form');
-    const actions = row.querySelector('.shelf-actions');
-    name.hidden = true;
-    form.hidden = false;
-    actions.hidden = true;
-    form.querySelector('input').focus();
-    form.querySelector('input').select();
-  }));
-
-  list.querySelectorAll('[data-cancel-rename]').forEach((button) => button.addEventListener('click', (event) => {
-    const row = event.currentTarget.closest('[data-shelf-id]');
-    row.querySelector('.rename-shelf-form').hidden = true;
-    row.querySelector('.shelf-name').hidden = false;
-    row.querySelector('.shelf-actions').hidden = false;
-  }));
-
-  list.querySelectorAll('.rename-shelf-form').forEach((form) => form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const row = event.currentTarget.closest('[data-shelf-id]');
-    const shelf = library.shelves.find((item) => String(item.id) === row.dataset.shelfId);
-    const name = new FormData(event.currentTarget).get('name').trim();
-    if (!shelf || !name) return;
-    try {
-      const updated = await updateShelf(supabase, shelf.id, name);
-      shelf.name = updated.name;
-      renderShelves();
-      setMessage('Étagère renommée.');
-    } catch (error) {
-      console.error(error);
-      setMessage(error.message || 'Impossible de renommer cette étagère.', true);
-    }
-  }));
+  editButton.disabled = !shelfSelect.value;
+  deleteButton.disabled = !shelfSelect.value;
 }
+
+function selectedShelf() {
+  return library.shelves.find((shelf) => String(shelf.id) === shelfSelect.value);
+}
+
+renderNav;
 
 $('#new-shelf-form').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -104,6 +69,9 @@ $('#new-shelf-form').addEventListener('submit', async (event) => {
     library.shelves.push(shelf);
     input.value = '';
     renderShelves();
+    shelfSelect.value = String(shelf.id);
+    editButton.disabled = false;
+    deleteButton.disabled = false;
     setMessage('Étagère ajoutée.');
   } catch (error) {
     console.error(error);
@@ -113,29 +81,62 @@ $('#new-shelf-form').addEventListener('submit', async (event) => {
   }
 });
 
-deleteSelect.addEventListener('change', () => {
-  deleteButton.disabled = !deleteSelect.value;
+shelfSelect.addEventListener('change', () => {
+  editButton.disabled = !shelfSelect.value;
+  deleteButton.disabled = !shelfSelect.value;
+  renameForm.hidden = true;
 });
 
-$('#delete-shelf-form').addEventListener('submit', async (event) => {
+editButton.addEventListener('click', () => {
+  const shelf = selectedShelf();
+  if (!shelf) return;
+  renameInput.value = shelf.name;
+  renameForm.hidden = false;
+  renameInput.focus();
+  renameInput.select();
+});
+
+$('#cancel-rename-shelf').addEventListener('click', () => {
+  renameForm.hidden = true;
+});
+
+renameForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const shelf = library.shelves.find((item) => String(item.id) === deleteSelect.value);
-  if (!shelf) {
-    setMessage('Choisissez une étagère à supprimer.', true);
-    return;
+  const shelf = selectedShelf();
+  const name = renameInput.value.trim();
+  if (!shelf || !name) return;
+
+  const submitButton = renameForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  try {
+    const updated = await updateShelf(supabase, shelf.id, name);
+    shelf.name = updated.name;
+    renderShelves();
+    renameForm.hidden = true;
+    setMessage('Étagère renommée.');
+  } catch (error) {
+    console.error(error);
+    setMessage(error.message || 'Impossible de renommer cette étagère.', true);
+  } finally {
+    submitButton.disabled = false;
   }
-  if (!confirm(`Supprimer l’étagère « ${shelf.name} » ?`)) return;
+});
+
+deleteButton.addEventListener('click', async () => {
+  const shelf = selectedShelf();
+  if (!shelf || !confirm(`Supprimer l’étagère « ${shelf.name} » ?`)) return;
 
   deleteButton.disabled = true;
   try {
     await deleteShelf(supabase, shelf.id);
     library.shelves = library.shelves.filter((item) => String(item.id) !== String(shelf.id));
+    renameForm.hidden = true;
     renderShelves();
     setMessage('Étagère supprimée.');
   } catch (error) {
     console.error(error);
     setMessage(error.message || 'Impossible de supprimer cette étagère.', true);
-    deleteButton.disabled = !deleteSelect.value;
+    deleteButton.disabled = !shelfSelect.value;
   }
 });
 
