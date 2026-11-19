@@ -7,82 +7,21 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="settings">
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">M</span> MyBiblio
-      </a>
-      <nav aria-label="Navigation principale">
-        <a href="index.html" data-nav="search">Rechercher</a>
-        <a href="add.html" data-nav="add">Ajouter un livre</a>
-        <a href="shelves.html" data-nav="shelves">Mes étagères</a>
-        <a href="acheter.html" data-nav="buy">À acheter</a>
-        <a href="settings.html" data-nav="settings">Paramètres</a>
-      </nav>
-    </div>
-  </header>
-
+  <header class="site-header"><div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a>
+    <nav aria-label="Navigation principale"><a href="index.html" data-nav="search">Rechercher</a><a href="add.html" data-nav="add">Ajouter un livre</a><a href="shelves.html" data-nav="shelves">Mes étagères</a><a href="acheter.html" data-nav="buy">À acheter</a><a href="settings.html" data-nav="settings">Paramètres</a></nav>
+  </div></header>
   <main class="container narrow main-content">
-    <section class="page-intro">
-      <h1>Paramètres</h1>
-      <p>Gérez vos étagères et vos préférences.</p>
+    <section class="page-intro"><h1>Paramètres</h1><p>Gérez vos étagères et vos préférences.</p></section>
+    <section aria-labelledby="shelves-title"><div class="section-heading"><div><h2 id="shelves-title">Mes étagères</h2><p class="muted">Créez et personnalisez vos étagères pour organiser votre collection.</p></div></div>
+      <div class="settings-card"><form id="new-shelf-form" class="form-card"><div class="field"><label for="new-shelf">Nom de l'étagère</label><input id="new-shelf" name="name" type="text" placeholder="Ex. Science-Fiction" required maxlength="60"></div><button type="submit" class="button-primary">Ajouter une étagère</button><p id="shelf-message" class="form-message" role="status" aria-live="polite"></p></form></div>
+      <div class="settings-card" style="margin-top: 24px"><div class="form-card"><div class="field"><label for="shelf-to-manage">Étagère à modifier ou supprimer</label><select id="shelf-to-manage" name="shelf" required><option value="">Choisir une étagère</option></select></div><div style="display: flex; flex-wrap: wrap; gap: 10px"><button id="edit-shelf-button" class="secondary-button" type="button" disabled>Modifier</button><button id="delete-shelf-button" class="danger-button" type="button" disabled>Supprimer</button></div>
+        <form id="rename-shelf-form" class="form-card" hidden><div class="field"><label for="rename-shelf-name">Nouveau nom de l’étagère</label><input id="rename-shelf-name" name="name" required maxlength="80"></div><div style="display: flex; flex-wrap: wrap; gap: 10px"><button class="button-primary" type="submit">Enregistrer</button><button id="cancel-rename-shelf" class="text-button" type="button">Annuler</button></div></form>
+      </div></div>
     </section>
-
-    <section aria-labelledby="shelves-title">
-      <div class="section-heading">
-        <div>
-          <h2 id="shelves-title">Mes étagères</h2>
-          <p class="muted">Créez et personnalisez vos étagères pour organiser votre collection.</p>
-        </div>
-      </div>
-
-      <div class="settings-card">
-        <form id="new-shelf-form" class="form-card">
-          <div class="field">
-            <label for="new-shelf">Nom de l'étagère</label>
-            <input id="new-shelf" name="name" type="text" placeholder="Ex. Science-Fiction" required maxlength="60">
-          </div>
-          <button type="submit" class="button-primary">Ajouter une étagère</button>
-          <p id="shelf-message" class="form-message" role="status" aria-live="polite"></p>
-        </form>
-      </div>
-
-      <div class="settings-card" style="margin-top: 24px">
-        <div class="form-card">
-          <div class="field">
-            <label for="shelf-to-manage">Étagère à modifier ou supprimer</label>
-            <select id="shelf-to-manage" name="shelf" required>
-              <option value="">Choisir une étagère</option>
-            </select>
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 10px">
-            <button id="edit-shelf-button" class="secondary-button" type="button" disabled>Modifier</button>
-            <button id="delete-shelf-button" class="danger-button" type="button" disabled>Supprimer</button>
-          </div>
-          <form id="rename-shelf-form" class="form-card" hidden>
-            <div class="field">
-              <label for="rename-shelf-name">Nouveau nom de l’étagère</label>
-              <input id="rename-shelf-name" name="name" required maxlength="80">
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px">
-              <button class="button-primary" type="submit">Enregistrer</button>
-              <button id="cancel-rename-shelf" class="text-button" type="button">Annuler</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <section class="settings-card" aria-labelledby="export-title" style="margin-top: 24px">
-      <div class="form-card">
-        <h2 id="export-title">Exporter ma bibliothèque</h2>
-        <p class="muted">Téléchargez la liste de vos livres et de leurs étagères au format CSV.</p>
-        <button id="export-books" class="button-primary" type="button">Exporter les livres</button>
-        <p id="export-message" class="form-message" role="status" aria-live="polite"></p>
-      </div>
-    </section>
+    <section class="settings-card" aria-labelledby="export-title" style="margin-top: 24px"><div class="form-card"><h2 id="export-title">Exporter ma bibliothèque</h2><p class="muted">Téléchargez la liste de vos livres et de leurs étagères au format CSV.</p><button id="export-books" class="button-primary" type="button">Exporter les livres</button><p id="export-message" class="form-message" role="status" aria-live="polite"></p></div></section>
   </main>
-
+  <script type="module" src="access-control.js"></script>
   <script type="module" src="settings.js"></script>
 </body>
 </html>

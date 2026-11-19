@@ -7,47 +7,20 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="shelves">
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="index.html">
-        <span class="brand-mark">M</span> MyBiblio
-      </a>
-      <nav aria-label="Navigation principale">
-        <a href="index.html" data-nav="search">Rechercher</a>
-        <a href="add.html" data-nav="add">Ajouter un livre</a>
-        <a href="shelves.html" data-nav="shelves">Mes étagères</a>
-        <a href="acheter.html" data-nav="buy">À acheter</a>
-        <a href="settings.html" data-nav="settings">Paramètres</a>
-      </nav>
+  <header class="site-header"><div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MyBiblio</a>
+    <nav aria-label="Navigation principale">
+      <a href="index.html" data-nav="search">Rechercher</a><a href="add.html" data-nav="add">Ajouter un livre</a><a href="shelves.html" data-nav="shelves">Mes étagères</a><a href="acheter.html" data-nav="buy">À acheter</a><a href="settings.html" data-nav="settings">Paramètres</a>
+    </nav>
+  </div></header>
+  <main class="main-content"><div class="container">
+    <div class="page-intro"><h1>Mes étagères</h1><p>Parcourez votre collection par univers.</p></div>
+    <div class="shelves-layout"><div class="shelf-menu-section"><div class="shelf-menu" id="shelf-list"></div></div>
+      <div class="books-section"><div class="section-heading"><div><h2 id="shelf-title">Tous les livres</h2><p id="shelf-subtitle"></p></div></div><div id="shelf-books"></div></div>
     </div>
-  </header>
-  <main class="main-content">
-    <div class="container">
-      <div class="page-intro">
-        <h1>Mes étagères</h1>
-        <p>Parcourez votre collection par univers.</p>
-      </div>
-      <div class="shelves-layout">
-        <div class="shelf-menu-section">
-          <div class="shelf-menu" id="shelf-list"></div>
-        </div>
-        <div class="books-section">
-          <div class="section-heading">
-            <div>
-              <h2 id="shelf-title">Tous les livres</h2>
-              <p id="shelf-subtitle"></p>
-            </div>
-          </div>
-          <div id="shelf-books"></div>
-        </div>
-      </div>
-    </div>
-  </main>
-  <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2025 MyBiblio. Tous droits réservés.</p>
-    </div>
-  </footer>
+  </div></main>
+  <footer class="site-footer"><div class="container"><p>&copy; 2025 MyBiblio. Tous droits réservés.</p></div></footer>
+  <script type="module" src="access-control.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>

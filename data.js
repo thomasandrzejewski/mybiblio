@@ -29,8 +29,8 @@ function nextShelfColor(existingShelves = []) {
 export async function loadLibrary(supabase, currentUser) {
   user = currentUser;
   const [{ data: shelves, error: shelvesError }, { data: books, error: booksError }] = await Promise.all([
-    supabase.from('shelves').select('*').order('name'),
-    supabase.from('books').select('*').order('created_at', { ascending: false })
+    supabase.from('shelves').select('*').eq('user_id', user.id).order('name'),
+    supabase.from('books').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
   ]);
   if (shelvesError) throw shelvesError;
   if (booksError) throw booksError;
@@ -102,7 +102,7 @@ export async function updateBook(supabase, id, book) {
 }
 
 export async function deleteBook(supabase, id) {
-  const { error } = await supabase.from('books').delete().eq('id', id);
+  const { error } = await supabase.from('books').delete().eq('id', id).eq('user_id', user.id);
   if (error) throw error;
 }
 
