@@ -46,6 +46,10 @@ function selectedShelf() {
   return library.shelves.find((shelf) => String(shelf.id) === shelfSelect.value);
 }
 
+function csvCell(value) {
+  return `"${String(value ?? '').replace(/"/g, '""')}"`;
+}
+
 $('#new-shelf-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const input = $('#new-shelf');
@@ -129,6 +133,35 @@ deleteButton.addEventListener('click', async () => {
   }
 });
 
+$('#export-books').addEventListener('click', () => {
+  const exportMessage = $('#export-message');
+
+  try {
+    const rows = [
+      ['title', 'author', 'shelf_name'],
+      ...library.books.map((book) => {
+        const shelf = library.shelves.find((item) => String(item.id) === String(book.shelf_id));
+        return [book.title, book.author, shelf?.name ?? null];
+      })
+    ];
+
+    const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(';')).join('\r\n')}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'ma-bibliotheque.csv';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    exportMessage.textContent = 'Export téléchargé.';
+  } catch (error) {
+    console.error(error);
+    exportMessage.textContent = 'Impossible d’exporter la bibliothèque.';
+  }
+});
+
 try {
   const user = await currentUser();
   if (!user) throw new Error('not-authenticated');
@@ -139,3 +172,4 @@ try {
   console.error(error);
   window.location.replace('auth.html');
 }
+
